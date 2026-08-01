@@ -1,0 +1,30 @@
+import { Redis } from '@upstash/redis'
+import type { DealsSnapshot } from '../../shared/types/offer'
+
+const SNAPSHOT_KEY = 'deals:snapshot'
+
+let client: Redis | null = null
+
+function getRedisClient(): Redis {
+  if (client) return client
+
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  if (!url || !token) {
+    throw new Error('UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN are not configured')
+  }
+
+  client = new Redis({ url, token })
+  return client
+}
+
+export async function readSnapshot(): Promise<DealsSnapshot | null> {
+  const redis = getRedisClient()
+  const snapshot = await redis.get<DealsSnapshot>(SNAPSHOT_KEY)
+  return snapshot ?? null
+}
+
+export async function writeSnapshot(snapshot: DealsSnapshot): Promise<void> {
+  const redis = getRedisClient()
+  await redis.set(SNAPSHOT_KEY, snapshot)
+}
