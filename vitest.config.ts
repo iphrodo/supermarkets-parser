@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vitest/config';
 
+import { defineVitestProject } from '@nuxt/test-utils/config';
+
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
 import { playwright } from '@vitest/browser-playwright';
@@ -11,7 +13,7 @@ const dirname =
   typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
-export default defineConfig({
+export default defineConfig(async () => ({
   test: {
     projects: [
       {
@@ -21,6 +23,17 @@ export default defineConfig({
           include: ['server/**/*.{test,spec}.ts', 'shared/**/*.{test,spec}.ts'],
         },
       },
+      await defineVitestProject({
+        test: {
+          name: 'app',
+          environmentOptions: {
+            nuxt: {
+              mock: { intersectionObserver: true },
+            },
+          },
+          include: ['app/**/*.{test,spec}.ts'],
+        },
+      }),
       {
         extends: true,
         plugins: [
@@ -40,4 +53,4 @@ export default defineConfig({
       },
     ],
   },
-});
+}));
