@@ -29,6 +29,7 @@ export interface Offer {
   mechanic: OfferMechanic
   purchaseLimit: string | null
   ean: string | null
+  imageUrl?: string | null
   scope: OfferScope
   store: OfferStoreRef | null
   validFrom: string

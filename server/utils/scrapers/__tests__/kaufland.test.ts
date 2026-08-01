@@ -10,7 +10,7 @@ describe('parseKauflandHtml', () => {
   const offers = parseKauflandHtml(fixtureHtml)
 
   it('parses every offer in the fixture', () => {
-    expect(offers).toHaveLength(9)
+    expect(offers).toHaveLength(10)
   })
 
   it('handles a tile without a crossed-out original price', () => {
@@ -22,11 +22,25 @@ describe('parseKauflandHtml', () => {
   it('extracts EAN from the product image URL when present', () => {
     const aloma = offers.find((o) => o.brand === 'ALOMA')
     expect(aloma!.ean).toBe('8606018614950')
+    expect(aloma!.imageUrl).toBe('https://kaufland.media.schwarz/is/image/schwarz/8606018614950_BG_P')
   })
 
   it('leaves EAN null when no barcode segment is present', () => {
     const potatoes = offers.find((o) => o.name === 'Клас: I')
     expect(potatoes!.ean).toBeNull()
+  })
+
+  it('populates imageUrl even when no barcode segment is present in the image URL', () => {
+    const potatoes = offers.find((o) => o.name === 'Клас: I')
+    expect(potatoes!.ean).toBeNull()
+    expect(potatoes!.imageUrl).not.toBeNull()
+  })
+
+  it('sets both ean and imageUrl to null when the tile has no image URL at all', () => {
+    const offer = offers.find((o) => o.brand === 'No Image Product')
+    expect(offer).toBeDefined()
+    expect(offer!.ean).toBeNull()
+    expect(offer!.imageUrl).toBeNull()
   })
 
   it('sets loyaltyTier to kaufland_card_xtra for a Kaufland Card Xtra price tag', () => {
