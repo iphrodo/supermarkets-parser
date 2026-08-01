@@ -206,6 +206,7 @@ function mapOffer(raw: KauflandRawOffer, category: KauflandCategory, scrapedAt: 
     mechanic: deriveMechanic(raw),
     purchaseLimit: derivePurchaseLimit(raw),
     ean,
+    imageUrl: raw.listImage ?? null,
     scope: 'national',
     store: null,
     validFrom: raw.dateFrom,
