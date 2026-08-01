@@ -1,10 +1,4 @@
-# deals-browsing-ui Specification
-
-## Purpose
-
-Presents the cached deal catalog to the end user as a single filterable page, always reading from the pre-built snapshot and never triggering live scraping from a page request.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Filterable listing
 The page SHALL let the user filter offers by retailer, category, and price. Filtering SHALL operate over the full set of matching offers even though only an initial batch is rendered at a time.
@@ -20,6 +14,8 @@ The page SHALL let the user filter offers by retailer, category, and price. Filt
 #### Scenario: Changing filters resets the visible batch
 - **WHEN** the user changes any filter (retailer, category, or price) while additional offers from the previous filter selection are still unrendered below the fold
 - **THEN** the visible list SHALL be replaced by the first batch of offers matching the new filters, discarding any previously rendered batch state
+
+## ADDED Requirements
 
 ### Requirement: Incremental scroll-triggered rendering
 The page SHALL render only a bounded initial batch of matching offers on load, and SHALL render additional batches of already-available offers as the user scrolls toward the end of the currently rendered list, instead of rendering all matching offers at once.
@@ -39,17 +35,3 @@ The page SHALL render only a bounded initial batch of matching offers on load, a
 #### Scenario: No matching offers
 - **WHEN** the current filters match zero offers
 - **THEN** the page SHALL show the existing empty-results state and SHALL NOT attempt to render any batch or scroll-loading indicator
-
-### Requirement: Source attribution on every offer
-Each displayed offer SHALL show which retailer it came from, alongside a reference to the retailer's own source page or file.
-
-#### Scenario: Offer card rendered
-- **WHEN** an offer is displayed in the list
-- **THEN** its retailer name and source attribution SHALL be visible without requiring further user interaction
-
-### Requirement: ISR-served, no live scraping on request
-The page SHALL be served via incremental static regeneration reading the cached snapshot; a page request SHALL NOT block on, or trigger, a live scrape.
-
-#### Scenario: Request during a stale cache window
-- **WHEN** the cached snapshot is older than the expected time of the last scheduled cron run
-- **THEN** the page SHALL still render the most recent available snapshot rather than scraping live or returning an error

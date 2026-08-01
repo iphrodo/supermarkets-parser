@@ -2,6 +2,8 @@
 import type { DealsFilterValue } from '../components/DealsFilterBar.vue'
 import type { DealsSnapshot } from '../../shared/types/offer'
 
+const BATCH_SIZE = 24
+
 const { data: snapshot } = await useFetch<DealsSnapshot>('/api/deals')
 
 const filter = ref<DealsFilterValue>({ retailer: 'all', category: 'all', maxPriceEurCents: null })
@@ -21,6 +23,40 @@ const filteredOffers = computed(() =>
   }),
 )
 
+const visibleCount = ref(BATCH_SIZE)
+
+watch(filteredOffers, () => {
+  visibleCount.value = BATCH_SIZE
+})
+
+const visibleOffers = computed(() => filteredOffers.value.slice(0, visibleCount.value))
+
+const hasMore = computed(() => visibleCount.value < filteredOffers.value.length)
+
+function loadMore() {
+  if (!hasMore.value) return
+  visibleCount.value = Math.min(visibleCount.value + BATCH_SIZE, filteredOffers.value.length)
+}
+
+const sentinel = useTemplateRef<HTMLElement>('sentinel')
+let observer: IntersectionObserver | null = null
+
+function observeSentinel() {
+  observer?.disconnect()
+  if (!sentinel.value) return
+  observer = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) loadMore()
+  })
+  observer.observe(sentinel.value)
+}
+
+watch(sentinel, observeSentinel)
+
+onUnmounted(() => {
+  observer?.disconnect()
+  observer = null
+})
+
 const generatedAtLabel = computed(() =>
   snapshot.value?.generatedAt ? new Date(snapshot.value.generatedAt).toLocaleString('bg-BG') : null,
 )
@@ -39,8 +75,17 @@ const generatedAtLabel = computed(() =>
 
     <p v-if="!filteredOffers.length" class="text-gray-500 dark:text-gray-400">No offers match these filters yet.</p>
 
-    <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <OfferCard v-for="offer in filteredOffers" :key="offer.offerKey" :offer="offer" />
-    </div>
+    <template v-else>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <OfferCard v-for="offer in visibleOffers" :key="offer.offerKey" :offer="offer" />
+      </div>
+
+      <div v-if="hasMore" ref="sentinel" class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        Loading more offers…
+      </div>
+      <p v-else class="py-6 text-center text-sm text-gray-400 dark:text-gray-500">
+        You've reached the end of the list.
+      </p>
+    </template>
   </div>
 </template>
