@@ -26,6 +26,7 @@ const baseOffer: Offer = {
   sourceUrl: 'https://www.kaufland.bg/aktualni-predlozheniya/oferti.html',
   scrapedAt: '2026-08-01T06:00:00.000Z',
   warnings: [],
+  imageUrl: 'https://www.kaufland.bg/dam/example/aloma-icecream.jpg',
 }
 
 const meta: Meta<typeof OfferCard> = {
@@ -91,6 +92,15 @@ export const LidlOffer: Story = {
       discountPercentage: 20.19,
       ean: null,
       sourceUrl: 'https://www.lidl.bg/explore/assets/webPriceData/bg/ExportSecondList.xlsx',
+      imageUrl: undefined,
     },
   },
+}
+
+export const NoImage: Story = {
+  args: { offer: { ...baseOffer, imageUrl: null } },
+}
+
+export const BrokenImage: Story = {
+  args: { offer: { ...baseOffer, imageUrl: 'https://example.invalid/broken.jpg' } },
 }

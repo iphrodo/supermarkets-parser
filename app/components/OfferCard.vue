@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import type { Offer } from '../../shared/types/offer'
 
 const props = defineProps<{ offer: Offer }>()
+
+const imageLoadFailed = ref(false)
+
+const showImage = computed(() => Boolean(props.offer.imageUrl) && !imageLoadFailed.value)
 
 const retailerLabel = computed(() => (props.offer.retailer === 'kaufland' ? 'Kaufland' : 'Lidl'))
 
@@ -46,6 +51,15 @@ function formatCents(cents: number): string {
         -{{ offer.discountPercentage }}%
       </span>
     </div>
+
+    <img
+      v-if="showImage"
+      :src="offer.imageUrl!"
+      :alt="offer.name"
+      class="h-32 w-full rounded object-contain"
+      loading="lazy"
+      @error="imageLoadFailed = true"
+    />
 
     <div>
       <p v-if="offer.brand" class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ offer.brand }}</p>
