@@ -35,6 +35,14 @@ const mechanicLabel = computed(() => {
 function formatCents(cents: number): string {
   return (cents / 100).toFixed(2)
 }
+
+function formatDate(isoDate: string): string {
+  const date = new Date(isoDate)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}.${month}.${year}`
+}
 </script>
 
 <template>
@@ -93,6 +101,8 @@ function formatCents(cents: number): string {
     </div>
 
     <p v-if="offer.purchaseLimit" class="text-xs text-gray-500 dark:text-gray-400">{{ offer.purchaseLimit }}</p>
+
+    <p class="text-xs text-gray-500 dark:text-gray-400">Valid until {{ formatDate(offer.validUntil) }}</p>
 
     <div class="mt-auto flex items-center justify-between border-t border-gray-100 pt-2 text-xs text-gray-400 dark:border-gray-800">
       <span>{{ offer.category }}{{ offer.campaign ? ` · ${offer.campaign}` : '' }}</span>
