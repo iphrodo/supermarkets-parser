@@ -8,7 +8,13 @@ const imageLoadFailed = ref(false)
 
 const showImage = computed(() => Boolean(props.offer.imageUrl) && !imageLoadFailed.value)
 
-const retailerLabel = computed(() => (props.offer.retailer === 'kaufland' ? 'Kaufland' : 'Lidl'))
+const RETAILER_LABELS: Record<Offer['retailer'], string> = {
+  kaufland: 'Kaufland',
+  lidl: 'Lidl',
+  billa: 'Billa',
+}
+
+const retailerLabel = computed(() => RETAILER_LABELS[props.offer.retailer])
 
 const loyaltyLabel = computed(() => {
   switch (props.offer.loyaltyTier) {

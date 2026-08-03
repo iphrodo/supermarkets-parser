@@ -1,4 +1,5 @@
 import { readSnapshot, writeSnapshot } from '../../utils/kv'
+import { fetchBillaOffers } from '../../utils/scrapers/billa'
 import { fetchKauflandOffers } from '../../utils/scrapers/kaufland'
 import { fetchLidlOffers } from '../../utils/scrapers/lidl'
 import { runDailySync } from '../../utils/sync'
@@ -18,6 +19,7 @@ export default defineEventHandler(async (event) => {
   const result = await runDailySync({
     fetchKauflandOffers,
     fetchLidlOffers,
+    fetchBillaOffers,
     readSnapshot,
     writeSnapshot,
   })

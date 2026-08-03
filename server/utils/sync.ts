@@ -11,6 +11,7 @@ interface SourceResult {
 export interface RunSyncDeps {
   fetchKauflandOffers: () => Promise<Offer[]>
   fetchLidlOffers: () => Promise<Offer[]>
+  fetchBillaOffers: () => Promise<Offer[]>
   readSnapshot: () => Promise<DealsSnapshot | null>
   writeSnapshot: (snapshot: DealsSnapshot) => Promise<void>
   now?: () => Date
@@ -43,13 +44,18 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
   const log = deps.logError ?? ((message: string, error: unknown) => console.error(message, error))
   const now = deps.now ?? (() => new Date())
 
-  const [kaufland, lidl] = await Promise.all([runSource(deps.fetchKauflandOffers), runSource(deps.fetchLidlOffers)])
+  const [kaufland, lidl, billa] = await Promise.all([
+    runSource(deps.fetchKauflandOffers),
+    runSource(deps.fetchLidlOffers),
+    runSource(deps.fetchBillaOffers),
+  ])
 
   if (!kaufland.ok) log('Kaufland ingestion failed', kaufland.error)
   if (!lidl.ok) log('Lidl ingestion failed', lidl.error)
+  if (!billa.ok) log('Billa ingestion failed', billa.error)
 
-  if (!kaufland.ok && !lidl.ok) {
-    log('Both sources failed in the same run; leaving the previously published snapshot untouched', undefined)
+  if (!kaufland.ok && !lidl.ok && !billa.ok) {
+    log('All sources failed in the same run; leaving the previously published snapshot untouched', undefined)
     return { published: false, reason: 'total-failure', snapshot: null }
   }
 
@@ -59,8 +65,9 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
     ? kaufland.offers
     : (previous?.offers.filter((offer) => offer.retailer === 'kaufland') ?? [])
   const lidlOffers = lidl.ok ? lidl.offers : (previous?.offers.filter((offer) => offer.retailer === 'lidl') ?? [])
+  const billaOffers = billa.ok ? billa.offers : (previous?.offers.filter((offer) => offer.retailer === 'billa') ?? [])
 
-  const merged = mergeCatalog(kauflandOffers, lidlOffers)
+  const merged = mergeCatalog(kauflandOffers, lidlOffers, billaOffers)
 
   const snapshot: DealsSnapshot = {
     offers: merged.offers,
@@ -68,11 +75,15 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
     sources: {
       kaufland: {
         ok: kaufland.ok,
-        scrapedAt: kaufland.ok ? kaufland.scrapedAt : (previous?.sources.kaufland.scrapedAt ?? null),
+        scrapedAt: kaufland.ok ? kaufland.scrapedAt : (previous?.sources.kaufland?.scrapedAt ?? null),
       },
       lidl: {
         ok: lidl.ok,
-        scrapedAt: lidl.ok ? lidl.scrapedAt : (previous?.sources.lidl.scrapedAt ?? null),
+        scrapedAt: lidl.ok ? lidl.scrapedAt : (previous?.sources.lidl?.scrapedAt ?? null),
+      },
+      billa: {
+        ok: billa.ok,
+        scrapedAt: billa.ok ? billa.scrapedAt : (previous?.sources.billa?.scrapedAt ?? null),
       },
     },
   }
@@ -81,7 +92,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
 
   return {
     published: true,
-    reason: kaufland.ok && lidl.ok ? 'success' : 'partial',
+    reason: kaufland.ok && lidl.ok && billa.ok ? 'success' : 'partial',
     snapshot,
   }
 }
