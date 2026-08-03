@@ -1,4 +1,4 @@
-export type Retailer = 'kaufland' | 'lidl'
+export type Retailer = 'kaufland' | 'lidl' | 'billa'
 
 export type OfferScope = 'national' | 'regional'
 
@@ -45,5 +45,6 @@ export interface DealsSnapshot {
   sources: {
     kaufland: { scrapedAt: string | null; ok: boolean }
     lidl: { scrapedAt: string | null; ok: boolean }
+    billa: { scrapedAt: string | null; ok: boolean }
   }
 }

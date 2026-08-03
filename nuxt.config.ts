@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     cronSecret: process.env.CRON_SECRET,
     upstashRedisRestUrl: process.env.UPSTASH_REDIS_REST_URL,
     upstashRedisRestToken: process.env.UPSTASH_REDIS_REST_TOKEN,
+    geminiApiKey: process.env.GEMINI_API_KEY,
   },
   routeRules: {
     '/': { isr: 60 * 30 },
