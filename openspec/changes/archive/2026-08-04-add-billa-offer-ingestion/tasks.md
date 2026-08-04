@@ -32,6 +32,7 @@
 - [x] 6.1 Add a `billa` entry to `DealsSnapshot.sources` in `shared/types/offer.ts`
 - [x] 6.2 Wire `fetchBillaOffers` into `server/utils/sync.ts`'s daily run, following the existing partial-failure isolation behavior (per-source `ok`/`scrapedAt`, no total-failure publish)
 - [x] 6.3 Add `fetchBillaOffers` to the cron endpoint(s) in `server/api/cron/`
+- [x] 6.4 Drop Vercel deployment/cron (`vercel.json`) in favor of local, intermittently-run hosting; add `server/utils/schedule.ts` (`mostRecentSyncWindow`) and `server/plugins/catch-up-sync.ts` to run a missed Mon/Thu 10:00 Kyiv sync on server start
 
 ## 7. Tests
 

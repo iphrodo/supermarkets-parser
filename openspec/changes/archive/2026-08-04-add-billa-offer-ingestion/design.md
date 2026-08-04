@@ -50,6 +50,9 @@ Persist the last successfully-processed publication slug (alongside the existing
 - `server/utils/scrapers/billa.ts`: exports `fetchBillaOffers()` (network + vision calls) and a separately-testable parse/normalize function, mirroring the `fetchXOffers()` / `parseXHtml()` split used by `kaufland.ts` and `lidl.ts`, so unit tests can feed fixture images/vision-response JSON without hitting the network or the vision API.
 - `server/utils/sync.ts`, `server/api/cron/*.ts`: add `fetchBillaOffers` alongside the existing two, following the same partial-failure isolation already specified in `deals-snapshot-cache`.
 
+### Scheduling: local catch-up on server start instead of Vercel cron
+Decided against deploying to Vercel, so `vercel.json`'s daily cron trigger no longer exists. The hosting model is now a server started intermittently by hand on the developer's machine. To still approximate a twice-weekly schedule (Monday and Thursday, 10:00 Kyiv time — chosen to match the leaflet's weekly refresh cadence with a second check in case Monday's run is missed), `server/plugins/catch-up-sync.ts` runs on every server boot and compares the published snapshot's `generatedAt` against `server/utils/schedule.ts`'s `mostRecentSyncWindow()` (the latest Mon/Thu 10:00 Kyiv slot that has already elapsed, computed via `Intl` so DST is handled without a date library). If the snapshot predates that window, sync runs immediately instead of waiting — this is what makes the schedule survive the server not running continuously (e.g. started Tuesday instead of Monday still catches Monday's window). The existing `server/api/cron/sync-deals.ts` endpoint (bearer-secret protected) is left in place as a manual trigger option.
+
 ## Risks / Trade-offs
 
 - **Publitas structure changes silently** → mitigated by the "no empty/partial publish on failure" behavior already required (log and keep last known-good Billa offers, same posture as the other two scrapers).

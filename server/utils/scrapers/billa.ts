@@ -13,7 +13,7 @@ const WEEKLY_LEAFLET_PATTERN = /weekly_digital_leaflet/i
 const SLUG_PATTERN = /\/billa-bulgaria\/([^/]+)\/?/
 /** Balances image legibility for the vision model against request payload size. */
 const PAGE_IMAGE_SIZE = 'at1600'
-const VISION_MODEL = 'gemini-3.5-flash'
+const VISION_MODEL = 'gemini-3.5-flash-lite'
 const VISION_CONCURRENCY = 4
 
 export class BillaIngestionError extends Error {
