@@ -181,6 +181,10 @@ export function parseLidlWorkbook(buffer: ArrayBuffer | Buffer): Offer[] {
   return deduped.map(({ row, divergent }) => mapOffer(row, divergent, LIDL_EXPORT_URL, scrapedAt))
 }
 
+export function isLidlXlsxOffer(offer: Offer): boolean {
+  return offer.retailer === 'lidl' && offer.sourceUrl === LIDL_EXPORT_URL
+}
+
 export async function fetchLidlOffers(): Promise<Offer[]> {
   let buffer: ArrayBuffer
   try {

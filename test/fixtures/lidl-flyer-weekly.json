@@ -1,0 +1,15 @@
+{
+  "flyer": {
+    "title": "Седмична брошура 03.08 - 09.08.2026",
+    "startDate": "2026-07-30",
+    "endDate": "2026-08-09",
+    "offerStartDate": "2026-08-03",
+    "offerEndDate": "2026-08-09",
+    "products": [],
+    "pages": [
+      { "number": 1, "zoom": "https://leaflets.schwarz/lidl-bg/kw32/page-1.jpg" },
+      { "number": 2, "zoom": "https://leaflets.schwarz/lidl-bg/kw32/page-2.jpg" },
+      { "number": 3, "zoom": "https://leaflets.schwarz/lidl-bg/kw32/page-3.jpg" }
+    ]
+  }
+}

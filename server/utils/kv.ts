@@ -3,6 +3,7 @@ import type { DealsSnapshot } from '../../shared/types/offer'
 
 const SNAPSHOT_KEY = 'deals:snapshot'
 const BILLA_PUBLICATION_SLUG_KEY = 'billa:last-publication-slug'
+const LIDL_LEAFLET_SLUG_KEY = 'lidl-leaflet:last-slug'
 
 let client: Redis | null = null
 
@@ -39,4 +40,15 @@ export async function readLastBillaPublicationSlug(): Promise<string | null> {
 export async function writeLastBillaPublicationSlug(slug: string): Promise<void> {
   const redis = getRedisClient()
   await redis.set(BILLA_PUBLICATION_SLUG_KEY, slug)
+}
+
+export async function readLastLidlLeafletSlug(): Promise<string | null> {
+  const redis = getRedisClient()
+  const slug = await redis.get<string>(LIDL_LEAFLET_SLUG_KEY)
+  return slug ?? null
+}
+
+export async function writeLastLidlLeafletSlug(slug: string): Promise<void> {
+  const redis = getRedisClient()
+  await redis.set(LIDL_LEAFLET_SLUG_KEY, slug)
 }
