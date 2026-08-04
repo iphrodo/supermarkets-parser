@@ -1,10 +1,4 @@
-# deals-snapshot-cache Specification
-
-## Purpose
-
-Decouples scraping from user traffic by running both ingestion jobs on a daily schedule and serving pre-built snapshots to every page request, so no visitor ever triggers a live scrape.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Twice-weekly scheduled ingestion only
 The system SHALL run Kaufland, Lidl (price-list), Lidl (leaflet), and Billa ingestion at most around each of the two weekly sync windows (Monday and Thursday, 10:00 Kyiv time), and SHALL NOT trigger scraping in response to a user page request. Since the server is not kept running continuously, the system SHALL catch up a missed window on the next server start rather than requiring the window to be hit exactly.
@@ -20,13 +14,6 @@ The system SHALL run Kaufland, Lidl (price-list), Lidl (leaflet), and Billa inge
 #### Scenario: Server starts with no missed window
 - **WHEN** the server starts and the published snapshot's `generatedAt` is already newer than the most recently elapsed sync window
 - **THEN** the system SHALL NOT run ingestion
-
-### Requirement: Durable cross-invocation storage
-Snapshots SHALL be persisted in external storage that survives serverless cold starts, not the runtime's default in-memory cache.
-
-#### Scenario: Cold start after previous instance recycled
-- **WHEN** a new serverless instance handles a request after a prior instance was recycled
-- **THEN** it SHALL still be able to read the most recently published snapshot
 
 ### Requirement: Partial-failure isolation between sources
 If one or more sources' ingestion fails during a scheduled run, the system SHALL still publish a snapshot using the succeeding sources' fresh data plus each failed source's last known-good data, rather than failing the entire snapshot. Since more than one source can share the same retailer identifier (e.g. Lidl's price-list and leaflet sources both tag offers with the same retailer), the system SHALL identify each source's own previously published offers by a means that distinguishes it from any other source sharing that retailer identifier, so that a failure in one such source never incorrectly resurrects another, still-succeeding source's stale offers.

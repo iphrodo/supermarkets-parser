@@ -1,9 +1,15 @@
 import * as cheerio from 'cheerio'
-import { GoogleGenAI, Type } from '@google/genai'
+import { Type } from '@google/genai'
 import { ofetch } from 'ofetch'
 import type { Offer } from '../../../shared/types/offer'
 import { readLastBillaPublicationSlug, readSnapshot, writeLastBillaPublicationSlug } from '../kv'
 import { computeOfferKey, computeProductKey } from '../normalize'
+import {
+  extractStructuredDataFromImage,
+  fetchPageImages as fetchPageImagesShared,
+  mapWithConcurrency,
+  type PageImageRef,
+} from './vision-extraction'
 
 export const BILLA_LEAFLET_PAGE_URL = 'https://www.billa.bg/promocii/sedmichna-broshura'
 
@@ -64,11 +70,6 @@ interface PublitasSpread {
   pages: PublitasSpreadPage[]
 }
 
-export interface PageImageRef {
-  pageNumber: number
-  imageUrl: string
-}
-
 /**
  * `spreads.json` is a public, unsigned manifest of every page's resize-proxy
  * image URLs at several sizes — reverse-engineered from the reader's own
@@ -96,32 +97,8 @@ async function fetchPageImageRefs(publicationUrl: string): Promise<PageImageRef[
   })
 }
 
-interface FetchedPage extends PageImageRef {
-  imageBuffer: ArrayBuffer
-}
-
-/** Fetches every page image, tolerating individual failures per the spec's partial-fetch requirement. */
-export async function fetchPageImages(refs: PageImageRef[]): Promise<{ pages: FetchedPage[]; skippedPages: number[] }> {
-  const results = await Promise.all(
-    refs.map(async (ref): Promise<FetchedPage | null> => {
-      try {
-        const imageBuffer = await ofetch<ArrayBuffer>(ref.imageUrl, { responseType: 'arrayBuffer' })
-        return { ...ref, imageBuffer }
-      } catch {
-        return null
-      }
-    }),
-  )
-
-  const pages: FetchedPage[] = []
-  const skippedPages: number[] = []
-  results.forEach((result, index) => {
-    if (result) pages.push(result)
-    else skippedPages.push(refs[index]!.pageNumber)
-  })
-
-  return { pages, skippedPages }
-}
+/** Re-exported so existing imports (e.g. `billa.test.ts`) keep working. */
+export const fetchPageImages = fetchPageImagesShared
 
 export interface BillaExtractedItem {
   name: string
@@ -194,69 +171,15 @@ const EXTRACTION_RESPONSE_SCHEMA = {
   required: ['items'],
 } as const
 
-let visionClient: GoogleGenAI | null = null
-
-function getVisionClient(): GoogleGenAI {
-  if (visionClient) return visionClient
-
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) {
-    throw new BillaIngestionError('GEMINI_API_KEY is not configured')
-  }
-
-  visionClient = new GoogleGenAI({ apiKey })
-  return visionClient
-}
-
 /** Exported separately so it can be swapped out in tests. */
 export async function extractOffersFromPageImage(imageBuffer: ArrayBuffer): Promise<BillaExtractedItem[]> {
-  const client = getVisionClient()
-  const base64Image = Buffer.from(imageBuffer).toString('base64')
-
-  let response: Awaited<ReturnType<typeof client.models.generateContent>>
-  try {
-    response = await client.models.generateContent({
-      model: VISION_MODEL,
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: EXTRACTION_PROMPT }, { inlineData: { mimeType: 'image/jpeg', data: base64Image } }],
-        },
-      ],
-      config: { responseMimeType: 'application/json', responseSchema: EXTRACTION_RESPONSE_SCHEMA },
-    })
-  } catch (error) {
-    throw new BillaIngestionError('Vision extraction request failed', { cause: error })
-  }
-
-  const text = response.text
-  if (!text) {
-    throw new BillaIngestionError('Vision extraction returned an empty response')
-  }
-
-  let parsed: { items?: BillaExtractedItem[] }
-  try {
-    parsed = JSON.parse(text)
-  } catch (error) {
-    throw new BillaIngestionError('Vision extraction returned invalid JSON', { cause: error })
-  }
-
+  const parsed = await extractStructuredDataFromImage<{ items?: BillaExtractedItem[] }>(
+    imageBuffer,
+    EXTRACTION_PROMPT,
+    EXTRACTION_RESPONSE_SCHEMA,
+    VISION_MODEL,
+  )
   return parsed.items ?? []
-}
-
-async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
-  const results: R[] = new Array(items.length)
-  let cursor = 0
-
-  async function worker() {
-    while (cursor < items.length) {
-      const index = cursor++
-      results[index] = await fn(items[index]!)
-    }
-  }
-
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
-  return results
 }
 
 const NON_CRITICAL_FIELDS = new Set(['brand', 'unitText', 'category'])

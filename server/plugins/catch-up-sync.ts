@@ -3,6 +3,7 @@ import { mostRecentSyncWindow } from '../utils/schedule'
 import { fetchBillaOffers } from '../utils/scrapers/billa'
 import { fetchKauflandOffers } from '../utils/scrapers/kaufland'
 import { fetchLidlOffers } from '../utils/scrapers/lidl'
+import { fetchLidlLeafletOffers } from '../utils/scrapers/lidl-leaflet'
 import { runDailySync } from '../utils/sync'
 
 /**
@@ -26,6 +27,7 @@ async function runCatchUpSync() {
   await runDailySync({
     fetchKauflandOffers,
     fetchLidlOffers,
+    fetchLidlLeafletOffers,
     fetchBillaOffers,
     readSnapshot,
     writeSnapshot,

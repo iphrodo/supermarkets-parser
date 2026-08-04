@@ -1,16 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { ofetch } from 'ofetch'
-import { describe, expect, it, vi } from 'vitest'
-import {
-  BillaIngestionError,
-  discoverPublicationUrl,
-  fetchPageImages,
-  parseBillaExtraction,
-  type BillaExtractedPage,
-} from '../billa'
-
-vi.mock('ofetch', () => ({ ofetch: vi.fn() }))
+import { describe, expect, it } from 'vitest'
+import { BillaIngestionError, discoverPublicationUrl, parseBillaExtraction, type BillaExtractedPage } from '../billa'
 
 const fixtureUrl = new URL('../../../../test/fixtures/billa-promocii.html', import.meta.url)
 const fixtureHtml = readFileSync(fileURLToPath(fixtureUrl), 'utf-8')
@@ -90,28 +81,5 @@ describe('parseBillaExtraction', () => {
     expect(offers).toHaveLength(1)
     expect(offers[0]!.warnings).toHaveLength(1)
     expect(offers[0]!.warnings[0]).toContain('brand')
-  })
-})
-
-describe('fetchPageImages', () => {
-  it('returns successfully fetched pages and records the page numbers that failed to fetch', async () => {
-    const mockedOfetch = vi.mocked(ofetch)
-    mockedOfetch.mockImplementation((url: unknown) => {
-      if (typeof url === 'string' && url.includes('page-2')) {
-        return Promise.reject(new Error('network error'))
-      }
-      return Promise.resolve(new ArrayBuffer(8))
-    })
-
-    const refs = [
-      { pageNumber: 1, imageUrl: 'https://view.publitas.com/page-1.jpg' },
-      { pageNumber: 2, imageUrl: 'https://view.publitas.com/page-2.jpg' },
-      { pageNumber: 3, imageUrl: 'https://view.publitas.com/page-3.jpg' },
-    ]
-
-    const result = await fetchPageImages(refs)
-
-    expect(result.pages.map((p) => p.pageNumber)).toEqual([1, 3])
-    expect(result.skippedPages).toEqual([2])
   })
 })
