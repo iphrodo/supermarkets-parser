@@ -1,7 +1,16 @@
+import type { ComparisonGroup } from '../../shared/types/comparison'
 import type { DealsSnapshot, Offer } from '../../shared/types/offer'
 import { mergeCatalog } from './catalog'
+import { buildComparisons } from './comparison'
+import type { ProductTypeAssignments, ProductTypeVocabulary } from './kv'
+import { classifyOffers as classifyOffersImpl, defaultClassifyOffersDeps } from './product-type'
 import { isLidlXlsxOffer } from './scrapers/lidl'
 import { isLidlLeafletOffer } from './scrapers/lidl-leaflet'
+
+export interface ClassifiedTypes {
+  vocabulary: ProductTypeVocabulary
+  assignments: ProductTypeAssignments
+}
 
 interface SourceResult {
   ok: boolean
@@ -27,6 +36,8 @@ export interface RunSyncDeps {
   fetchBillaOffers: () => Promise<Offer[]>
   readSnapshot: () => Promise<DealsSnapshot | null>
   writeSnapshot: (snapshot: DealsSnapshot) => Promise<void>
+  /** Injectable so tests never touch the network; defaults to the real model-backed classifier. */
+  classifyOffers?: (offers: Offer[]) => Promise<ClassifiedTypes>
   now?: () => Date
   logError?: (message: string, error: unknown) => void
 }
@@ -85,6 +96,17 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
 
   const merged = mergeCatalog(...offersBySource)
 
+  const classify = deps.classifyOffers ?? ((offers) => classifyOffersImpl(offers, defaultClassifyOffersDeps()))
+
+  let comparisons: ComparisonGroup[]
+  try {
+    const { vocabulary, assignments } = await classify(merged.offers)
+    comparisons = buildComparisons(merged.offers, vocabulary, assignments)
+  } catch (error) {
+    log('Comparison enrichment failed; publishing with the previous snapshot’s comparisons', error)
+    comparisons = previous?.comparisons ?? []
+  }
+
   const sourcesBlock = Object.fromEntries(
     sources.map((source, index) => {
       const result = results[index]!
@@ -97,6 +119,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
 
   const snapshot: DealsSnapshot = {
     offers: merged.offers,
+    comparisons,
     generatedAt: now().toISOString(),
     sources: sourcesBlock,
   }

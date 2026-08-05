@@ -13,15 +13,13 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('deals page infinite scroll: empty results', () => {
-  it('shows the empty-results state with no batch or scroll indicators', async () => {
-    registerEndpoint('/api/deals', () => makeSnapshot([]))
+describe('comparison landing page: empty state', () => {
+  it('shows an explicit empty state when no comparison groups are available', async () => {
+    registerEndpoint('/api/deals', () => makeSnapshot([], []))
 
     const wrapper = await mountSuspended(IndexPage)
 
-    expect(wrapper.text()).toContain('No offers match these filters yet.')
+    expect(wrapper.text()).toContain('No product is currently on offer in two or more stores.')
     expect(wrapper.findAll('article')).toHaveLength(0)
-    expect(wrapper.text()).not.toContain('Loading more offers')
-    expect(wrapper.text()).not.toContain("You've reached the end of the list.")
   })
 })

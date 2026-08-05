@@ -1,7 +1,7 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import IndexPage from '../index.vue'
+import DealsPage from '../deals.vue'
 import { BATCH_SIZE, MockIntersectionObserver, makeOffer, makeSnapshot } from './fixtures'
 
 beforeEach(() => {
@@ -21,7 +21,7 @@ describe('deals page infinite scroll: filter reset', () => {
     ]
     registerEndpoint('/api/deals', () => makeSnapshot(offers))
 
-    const wrapper = await mountSuspended(IndexPage)
+    const wrapper = await mountSuspended(DealsPage)
     expect(wrapper.findAll('article')).toHaveLength(BATCH_SIZE)
 
     MockIntersectionObserver.instances[0]!.trigger(true)
