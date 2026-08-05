@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 
+import type { ComparisonEntry, ComparisonGroup, UnitBase } from '../../../shared/types/comparison'
 import type { DealsSnapshot, Offer, Retailer } from '../../../shared/types/offer'
 
 export const BATCH_SIZE = 24
@@ -33,14 +34,34 @@ export function makeOffer(index: number, retailer: Retailer = 'kaufland'): Offer
   }
 }
 
-export function makeSnapshot(offers: Offer[]): DealsSnapshot {
+export function makeSnapshot(offers: Offer[], comparisons: ComparisonGroup[] = []): DealsSnapshot {
   return {
     offers,
+    comparisons,
     generatedAt: '2026-01-01T00:00:00.000Z',
     sources: {
       kaufland: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
       lidl: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
+      lidlLeaflet: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
+      billa: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
     },
+  }
+}
+
+export function makeComparisonGroup(overrides: Partial<ComparisonGroup> = {}): ComparisonGroup {
+  const entries: ComparisonEntry[] = overrides.entries ?? [
+    { offerKey: 'offer-0', retailer: 'kaufland', priceEurCents: 500, unitPriceEurCents: 1000, isCheapest: false },
+    { offerKey: 'offer-1', retailer: 'lidl', priceEurCents: 400, unitPriceEurCents: 800, isCheapest: true },
+  ]
+
+  return {
+    groupKey: 'group-0',
+    labelBg: 'Пилешко филе',
+    unitBase: 'kg' as UnitBase,
+    entries,
+    savingsPercentage: 0.2,
+    warnings: [],
+    ...overrides,
   }
 }
 

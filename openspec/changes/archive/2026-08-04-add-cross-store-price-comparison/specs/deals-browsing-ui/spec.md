@@ -1,10 +1,4 @@
-# deals-browsing-ui Specification
-
-## Purpose
-
-Presents the cached deal catalog to the end user as a single filterable page, always reading from the pre-built snapshot and never triggering live scraping from a page request.
-
-## Requirements
+## ADDED Requirements
 
 ### Requirement: Price comparison is the landing view
 The landing page SHALL present cross-retailer price comparisons rather than the flat offer list, showing for each canonical product type the participating retailers' per-unit prices with the cheapest one visually distinguished.
@@ -20,6 +14,8 @@ The landing page SHALL present cross-retailer price comparisons rather than the 
 #### Scenario: Comparison entries are traceable to their offers
 - **WHEN** a comparison entry is displayed
 - **THEN** the underlying offer's product name, pack size, and retailer SHALL be visible, so the user can see what is being compared
+
+## MODIFIED Requirements
 
 ### Requirement: Filterable listing
 The full offer listing SHALL remain available on its own route, reachable from the landing view, and SHALL let the user filter offers by retailer, category, and price. Filtering SHALL operate over the full set of matching offers even though only an initial batch is rendered at a time.
@@ -58,39 +54,6 @@ Both the comparison view and the full offer listing SHALL render only a bounded 
 #### Scenario: No matching items
 - **WHEN** the current view matches zero items
 - **THEN** the page SHALL show its empty state and SHALL NOT attempt to render any batch or scroll-loading indicator
-
-### Requirement: Source attribution on every offer
-Each displayed offer SHALL show which retailer it came from, alongside a reference to the retailer's own source page or file.
-
-#### Scenario: Offer card rendered
-- **WHEN** an offer is displayed in the list
-- **THEN** its retailer name and source attribution SHALL be visible without requiring further user interaction
-
-### Requirement: Product image on offer card
-Each displayed offer SHALL show its product image when the offer's `imageUrl` field is populated, and SHALL render without an image area when no image is available or the image fails to load.
-
-#### Scenario: Offer has a populated image URL
-- **WHEN** an offer is displayed whose `imageUrl` field is populated
-- **THEN** the product image SHALL be visible on the offer card
-
-#### Scenario: Offer has no image URL
-- **WHEN** an offer is displayed whose `imageUrl` field is null, or whose schema has no `imageUrl` field at all (e.g. a Lidl offer)
-- **THEN** the offer card SHALL render without an image area, and SHALL NOT show a broken-image placeholder or leave an empty gap in the layout
-
-#### Scenario: Image fails to load
-- **WHEN** an offer's `imageUrl` is populated but the image resource fails to load (broken link, network error)
-- **THEN** the offer card SHALL fall back to the no-image layout instead of showing a broken-image icon
-
-### Requirement: Offer end date on offer card
-Each displayed offer SHALL show the date its discount expires (`validUntil`), formatted as a human-readable date rather than a raw ISO timestamp.
-
-#### Scenario: Offer card rendered
-- **WHEN** an offer is displayed in the list
-- **THEN** its end date SHALL be visible on the card without requiring further user interaction
-
-#### Scenario: End date formatting
-- **WHEN** an offer's `validUntil` value is rendered
-- **THEN** it SHALL be shown as a human-readable date (e.g. including a day, month, and year) rather than the raw ISO date string
 
 ### Requirement: ISR-served, no live scraping on request
 Both the comparison view and the full offer listing SHALL be served via incremental static regeneration reading the cached snapshot; a page request SHALL NOT block on, or trigger, a live scrape or any classification work.

@@ -1,9 +1,24 @@
 import { Redis } from '@upstash/redis'
 import type { DealsSnapshot } from '../../shared/types/offer'
+import type { UnitBase } from '../../shared/types/comparison'
 
 const SNAPSHOT_KEY = 'deals:snapshot'
 const BILLA_PUBLICATION_SLUG_KEY = 'billa:last-publication-slug'
 const LIDL_LEAFLET_SLUG_KEY = 'lidl-leaflet:last-slug'
+const PRODUCT_TYPE_VOCABULARY_KEY = 'product-types:vocabulary'
+const PRODUCT_TYPE_ASSIGNMENTS_KEY = 'product-types:assignments'
+
+export interface ProductType {
+  id: string
+  labelBg: string
+  labelEn: string
+  unitBase: UnitBase
+}
+
+export type ProductTypeVocabulary = ProductType[]
+
+/** Maps a date-free `productKey` to the `ProductType.id` it was classified as. */
+export type ProductTypeAssignments = Record<string, string>
 
 let client: Redis | null = null
 
@@ -51,4 +66,26 @@ export async function readLastLidlLeafletSlug(): Promise<string | null> {
 export async function writeLastLidlLeafletSlug(slug: string): Promise<void> {
   const redis = getRedisClient()
   await redis.set(LIDL_LEAFLET_SLUG_KEY, slug)
+}
+
+export async function readProductTypeVocabulary(): Promise<ProductTypeVocabulary> {
+  const redis = getRedisClient()
+  const vocabulary = await redis.get<ProductTypeVocabulary>(PRODUCT_TYPE_VOCABULARY_KEY)
+  return vocabulary ?? []
+}
+
+export async function writeProductTypeVocabulary(vocabulary: ProductTypeVocabulary): Promise<void> {
+  const redis = getRedisClient()
+  await redis.set(PRODUCT_TYPE_VOCABULARY_KEY, vocabulary)
+}
+
+export async function readProductTypeAssignments(): Promise<ProductTypeAssignments> {
+  const redis = getRedisClient()
+  const assignments = await redis.get<ProductTypeAssignments>(PRODUCT_TYPE_ASSIGNMENTS_KEY)
+  return assignments ?? {}
+}
+
+export async function writeProductTypeAssignments(assignments: ProductTypeAssignments): Promise<void> {
+  const redis = getRedisClient()
+  await redis.set(PRODUCT_TYPE_ASSIGNMENTS_KEY, assignments)
 }

@@ -65,6 +65,7 @@ describe('runDailySync', () => {
   it('carries forward a failed source’s last known-good offers when the others succeed', async () => {
     const previous: DealsSnapshot = {
       offers: [makeOffer('kaufland', { offerKey: 'stale-kaufland', scrapedAt: '2026-07-31T00:00:00.000Z' })],
+      comparisons: [],
       generatedAt: '2026-07-31T00:00:00.000Z',
       sources: {
         kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
@@ -101,6 +102,7 @@ describe('runDailySync', () => {
   it('publishes with only Billa fresh when Kaufland, Lidl, and the Lidl leaflet all fail', async () => {
     const previous: DealsSnapshot = {
       offers: [makeOffer('kaufland', { offerKey: 'stale-kaufland' }), makeOffer('lidl', { offerKey: 'stale-lidl' })],
+      comparisons: [],
       generatedAt: '2026-07-31T00:00:00.000Z',
       sources: {
         kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
@@ -165,6 +167,7 @@ describe('runDailySync', () => {
         makeOffer('lidl', { offerKey: 'stale-lidl-xlsx', sourceUrl: LIDL_XLSX_URL }),
         makeLidlLeafletOffer({ offerKey: 'stale-lidl-leaflet' }),
       ],
+      comparisons: [],
       generatedAt: '2026-07-31T00:00:00.000Z',
       sources: {
         kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
@@ -193,5 +196,59 @@ describe('runDailySync', () => {
     expect(offerKeys).toContain('stale-lidl-xlsx')
     expect(offerKeys).toContain('fresh-lidl-leaflet')
     expect(offerKeys).not.toContain('stale-lidl-leaflet')
+  })
+
+  it('publishes with the previous comparisons when comparison enrichment fails', async () => {
+    const previousComparisons: DealsSnapshot['comparisons'] = [
+      { groupKey: 'chicken-breast', labelBg: 'Пилешко филе', unitBase: 'kg', entries: [], savingsPercentage: 0.2, warnings: [] },
+    ]
+    const previous: DealsSnapshot = {
+      offers: [],
+      comparisons: previousComparisons,
+      generatedAt: '2026-07-31T00:00:00.000Z',
+      sources: {
+        kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
+        lidl: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
+        lidlLeaflet: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
+        billa: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
+      },
+    }
+
+    const writeSnapshot = vi.fn()
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => [makeOffer('kaufland')],
+      fetchLidlOffers: async () => [makeOffer('lidl')],
+      fetchLidlLeafletOffers: async () => [makeLidlLeafletOffer()],
+      fetchBillaOffers: async () => [makeOffer('billa')],
+      readSnapshot: async () => previous,
+      writeSnapshot,
+      classifyOffers: async () => {
+        throw new Error('classification service unavailable')
+      },
+      logError: silentLog,
+    })
+
+    expect(result.published).toBe(true)
+    expect(result.snapshot!.comparisons).toEqual(previousComparisons)
+  })
+
+  it('publishes comparisons derived from this run’s offers when classification succeeds', async () => {
+    const writeSnapshot = vi.fn()
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => [makeOffer('kaufland', { offerKey: 'k', productKey: 'k', priceEurCents: 500, unitText: '500 г' })],
+      fetchLidlOffers: async () => [makeOffer('lidl', { offerKey: 'l', productKey: 'l', priceEurCents: 400, unitText: '500 г' })],
+      fetchLidlLeafletOffers: async () => [],
+      fetchBillaOffers: async () => [],
+      readSnapshot: async () => null,
+      writeSnapshot,
+      classifyOffers: async () => ({
+        vocabulary: [{ id: 'chicken-breast', labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg' }],
+        assignments: { k: 'chicken-breast', l: 'chicken-breast' },
+      }),
+      logError: silentLog,
+    })
+
+    expect(result.snapshot!.comparisons).toHaveLength(1)
+    expect(result.snapshot!.comparisons[0]!.groupKey).toBe('chicken-breast')
   })
 })

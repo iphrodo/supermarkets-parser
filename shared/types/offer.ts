@@ -1,3 +1,5 @@
+import type { ComparisonGroup } from './comparison'
+
 export type Retailer = 'kaufland' | 'lidl' | 'billa'
 
 export type OfferScope = 'national' | 'regional'
@@ -41,6 +43,7 @@ export interface Offer {
 
 export interface DealsSnapshot {
   offers: Offer[]
+  comparisons: ComparisonGroup[]
   generatedAt: string
   sources: {
     kaufland: { scrapedAt: string | null; ok: boolean }

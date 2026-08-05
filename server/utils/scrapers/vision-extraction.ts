@@ -99,6 +99,37 @@ export async function extractStructuredDataFromImage<T>(
   }
 }
 
+/** Runs a Gemini text-only call and parses its JSON response into `T`; the classification counterpart to `extractStructuredDataFromImage`. */
+export async function extractStructuredData<T>(
+  prompt: string,
+  responseSchema: object,
+  model = 'gemini-3.5-flash-lite',
+): Promise<T> {
+  const client = getVisionClient()
+
+  let response: Awaited<ReturnType<typeof client.models.generateContent>>
+  try {
+    response = await client.models.generateContent({
+      model,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: { responseMimeType: 'application/json', responseSchema },
+    })
+  } catch (error) {
+    throw new VisionExtractionError('Structured data request failed', { cause: error })
+  }
+
+  const text = response.text
+  if (!text) {
+    throw new VisionExtractionError('Structured data request returned an empty response')
+  }
+
+  try {
+    return JSON.parse(text) as T
+  } catch (error) {
+    throw new VisionExtractionError('Structured data request returned invalid JSON', { cause: error })
+  }
+}
+
 export async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
   const results: R[] = new Array(items.length)
   let cursor = 0

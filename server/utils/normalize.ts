@@ -1,16 +1,19 @@
 import { createHash } from 'node:crypto'
 
+/** Splits slash-joined multi-unit text into trimmed, lowercased, whitespace-collapsed segments. */
+export function splitUnitSegments(unitText: string): string[] {
+  return unitText
+    .split('/')
+    .map((token) => token.trim().toLowerCase().replace(/\s+/g, ' '))
+    .filter(Boolean)
+}
+
 /**
  * Collapses case, whitespace, and token order differences in unit/quantity
  * text (e.g. "3 л/ 1455 г" vs "1455 г/ 3 л") so both hash to the same key.
  */
 export function normalizeUnitText(unitText: string): string {
-  return unitText
-    .split('/')
-    .map((token) => token.trim().toLowerCase().replace(/\s+/g, ' '))
-    .filter(Boolean)
-    .sort()
-    .join('/')
+  return [...splitUnitSegments(unitText)].sort().join('/')
 }
 
 export function normalizeNameText(name: string): string {
