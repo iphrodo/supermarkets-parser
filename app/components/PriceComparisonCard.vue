@@ -67,7 +67,17 @@ function formatCents(cents: number): string {
               Cheapest
             </span>
           </span>
-          <span class="text-xs text-gray-500 dark:text-gray-400">{{ row.offer.name }} · {{ row.offer.unitText }}</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400">
+            {{ row.offer.name }} · {{ row.offer.unitText }}<template v-if="row.offer.ean"> · {{ row.offer.ean }}</template>
+          </span>
+          <a
+            :href="row.offer.sourceUrl"
+            target="_blank"
+            rel="noopener"
+            class="text-xs text-gray-400 underline hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            Source
+          </a>
         </div>
 
         <div class="flex flex-col items-end">

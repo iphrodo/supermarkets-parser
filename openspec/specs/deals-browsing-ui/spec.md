@@ -21,6 +21,18 @@ The landing page SHALL present cross-retailer price comparisons rather than the 
 - **WHEN** a comparison entry is displayed
 - **THEN** the underlying offer's product name, pack size, and retailer SHALL be visible, so the user can see what is being compared
 
+#### Scenario: Comparison entry links to its source
+- **WHEN** a comparison entry is displayed
+- **THEN** a link to that offer's `sourceUrl` SHALL be visible and SHALL open in a new tab, for every retailer row in the group, not only the cheapest one
+
+#### Scenario: Comparison entry shows its EAN when available
+- **WHEN** a comparison entry's underlying offer has a non-null `ean`
+- **THEN** the EAN code SHALL be visible on that entry
+
+#### Scenario: Comparison entry has no EAN
+- **WHEN** a comparison entry's underlying offer has `ean: null`
+- **THEN** no EAN code SHALL be shown for that entry, and no empty placeholder or stray separator SHALL be left in its place
+
 ### Requirement: Filterable listing
 The full offer listing SHALL remain available on its own route, reachable from the landing view, and SHALL let the user filter offers by retailer, category, and price. Filtering SHALL operate over the full set of matching offers even though only an initial batch is rendered at a time.
 
