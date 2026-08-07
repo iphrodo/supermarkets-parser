@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { Offer } from '../../shared/types/offer'
+import { computed } from 'vue'
+import type { LeafletPage, Offer } from '../../shared/types/offer'
+import ProductThumb from './ProductThumb.vue'
 
-const props = defineProps<{ offer: Offer }>()
-
-const imageLoadFailed = ref(false)
-
-const showImage = computed(() => Boolean(props.offer.imageUrl) && !imageLoadFailed.value)
+const props = withDefaults(
+  defineProps<{
+    offer: Offer
+    /** The leaflet page this offer's crop points at, when it has one. */
+    page?: LeafletPage | null
+  }>(),
+  { page: null },
+)
 
 const RETAILER_LABELS: Record<Offer['retailer'], string> = {
   kaufland: 'Kaufland',
@@ -66,14 +70,7 @@ function formatDate(isoDate: string): string {
       </span>
     </div>
 
-    <img
-      v-if="showImage"
-      :src="offer.imageUrl!"
-      :alt="offer.name"
-      class="h-32 w-full rounded object-contain"
-      loading="lazy"
-      @error="imageLoadFailed = true"
-    />
+    <ProductThumb :offer="offer" :page="page" />
 
     <div>
       <p v-if="offer.brand" class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ offer.brand }}</p>
