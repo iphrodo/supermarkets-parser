@@ -9,7 +9,7 @@ const EMPTY_SNAPSHOT: DealsSnapshot = {
   sources: {
     kaufland: { ok: false, scrapedAt: null },
     lidl: { ok: false, scrapedAt: null },
-    lidlLeaflet: { ok: false, scrapedAt: null },
+    lidlSite: { ok: false, scrapedAt: null },
     billa: { ok: false, scrapedAt: null },
   },
 }

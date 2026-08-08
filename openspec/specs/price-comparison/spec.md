@@ -70,7 +70,7 @@ The system SHALL build comparison groups from offers sharing a canonical product
 - **THEN** the group SHALL contain a single entry for that retailer, representing its lowest per-unit price
 
 #### Scenario: Two sources share one retailer
-- **WHEN** offers from the Lidl price-list source and the Lidl leaflet source fall into the same canonical type
+- **WHEN** offers from the Lidl price-list source and the Lidl product-listing source fall into the same canonical type
 - **THEN** they SHALL be reduced to one Lidl entry, and SHALL NOT be presented as two retailers being compared
 
 #### Scenario: Only one retailer offers a product type

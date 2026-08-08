@@ -6,7 +6,7 @@ import type { ProductTypeAssignments, ProductTypeVocabulary } from './kv'
 import { classifyOffers as classifyOffersImpl, defaultClassifyOffersDeps } from './product-type'
 import { BILLA_PAGE_ID_PREFIX } from './scrapers/billa'
 import { isLidlXlsxOffer } from './scrapers/lidl'
-import { isLidlLeafletOffer, LIDL_LEAFLET_PAGE_ID_PREFIX } from './scrapers/lidl-leaflet'
+import { isLidlSiteOffer } from './scrapers/lidl-site'
 import { selectPagesByPrefix } from './scrapers/vision-extraction'
 
 export interface ClassifiedTypes {
@@ -43,7 +43,7 @@ interface SourceConfig {
 export interface RunSyncDeps {
   fetchKauflandOffers: () => Promise<SourceIngestResult>
   fetchLidlOffers: () => Promise<SourceIngestResult>
-  fetchLidlLeafletOffers: () => Promise<SourceIngestResult>
+  fetchLidlSiteOffers: () => Promise<SourceIngestResult>
   fetchBillaOffers: () => Promise<SourceIngestResult>
   readSnapshot: () => Promise<DealsSnapshot | null>
   writeSnapshot: (snapshot: DealsSnapshot) => Promise<void>
@@ -87,6 +87,19 @@ function pruneUnreferencedPages(
 }
 
 /**
+ * A snapshot published before a source was added, removed, or renamed carries
+ * no status for it. That is a source change, not a corrupt snapshot, so it
+ * reads as "no last known-good data" rather than throwing and taking the
+ * remaining sources' carry-forward down with it.
+ */
+function previousSourceStatus(
+  previous: DealsSnapshot | null,
+  key: SourceKey,
+): { scrapedAt: string | null; ok: boolean } {
+  return previous?.sources?.[key] ?? { scrapedAt: null, ok: false }
+}
+
+/**
  * Orchestrates one scheduled sync: runs every source's ingestion, isolates
  * each source's failure by carrying forward its own last known-good offers
  * (distinguished from any other source sharing the same retailer via
@@ -101,13 +114,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
   const sources: SourceConfig[] = [
     { key: 'kaufland', label: 'Kaufland', fetch: deps.fetchKauflandOffers, belongsToSource: (o) => o.retailer === 'kaufland' },
     { key: 'lidl', label: 'Lidl', fetch: deps.fetchLidlOffers, belongsToSource: isLidlXlsxOffer },
-    {
-      key: 'lidlLeaflet',
-      label: 'Lidl leaflet',
-      fetch: deps.fetchLidlLeafletOffers,
-      belongsToSource: isLidlLeafletOffer,
-      pageIdPrefix: LIDL_LEAFLET_PAGE_ID_PREFIX,
-    },
+    { key: 'lidlSite', label: 'Lidl site', fetch: deps.fetchLidlSiteOffers, belongsToSource: isLidlSiteOffer },
     {
       key: 'billa',
       label: 'Billa',
@@ -164,7 +171,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
       const result = results[index]!
       return [
         source.key,
-        { ok: result.ok, scrapedAt: result.ok ? result.scrapedAt : (previous?.sources[source.key]?.scrapedAt ?? null) },
+        { ok: result.ok, scrapedAt: result.ok ? result.scrapedAt : previousSourceStatus(previous, source.key).scrapedAt },
       ]
     }),
   ) as DealsSnapshot['sources']

@@ -76,7 +76,7 @@ export interface DealsSnapshot {
   sources: {
     kaufland: { scrapedAt: string | null; ok: boolean }
     lidl: { scrapedAt: string | null; ok: boolean }
-    lidlLeaflet: { scrapedAt: string | null; ok: boolean }
+    lidlSite: { scrapedAt: string | null; ok: boolean }
     billa: { scrapedAt: string | null; ok: boolean }
   }
 }

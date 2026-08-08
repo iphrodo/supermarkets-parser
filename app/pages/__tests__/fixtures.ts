@@ -44,7 +44,7 @@ export function makeSnapshot(offers: Offer[], comparisons: ComparisonGroup[] = [
     sources: {
       kaufland: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
       lidl: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
-      lidlLeaflet: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
+      lidlSite: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
       billa: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },
     },
   }
