@@ -10,6 +10,8 @@ const filter = ref<DealsFilterValue>({ retailer: 'all', category: 'all', maxPric
 
 const offers = computed(() => snapshot.value?.offers ?? [])
 
+const leafletPages = computed(() => snapshot.value?.leafletPages ?? {})
+
 const categories = computed(() =>
   Array.from(new Set(offers.value.map((offer) => offer.category))).sort((a, b) => a.localeCompare(b)),
 )
@@ -45,7 +47,12 @@ const generatedAtLabel = computed(() =>
 
     <template v-else>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <OfferCard v-for="offer in visibleOffers" :key="offer.offerKey" :offer="offer" />
+        <OfferCard
+          v-for="offer in visibleOffers"
+          :key="offer.offerKey"
+          :offer="offer"
+          :page="offer.imageCrop ? (leafletPages[offer.imageCrop.pageId] ?? null) : null"
+        />
       </div>
 
       <div v-if="hasMore" ref="sentinel" class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">

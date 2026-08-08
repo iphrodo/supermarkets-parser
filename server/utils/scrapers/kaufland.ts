@@ -134,7 +134,7 @@ function parseMoneyToCents(formatted: string | undefined | null): number | null 
   const match = formatted.match(/([\d.,]+)/)
   if (!match) return null
 
-  const normalized = match[1].replace(/\./g, '').replace(',', '.')
+  const normalized = match[1]!.replace(/\./g, '').replace(',', '.')
   const value = Number.parseFloat(normalized)
   if (Number.isNaN(value)) return null
 
@@ -144,7 +144,7 @@ function parseMoneyToCents(formatted: string | undefined | null): number | null 
 function deriveEan(imageUrl: string | undefined): string | null {
   if (!imageUrl) return null
   const match = imageUrl.match(EAN_PATTERN)
-  return match ? match[1] : null
+  return match?.[1] ?? null
 }
 
 function deriveLoyaltyTier(raw: KauflandRawOffer): LoyaltyTier {

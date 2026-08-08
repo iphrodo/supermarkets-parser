@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { ofetch } from 'ofetch'
+import type { LeafletPage } from '../../../shared/types/offer'
 
 export class VisionExtractionError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
@@ -13,8 +14,30 @@ export interface PageImageRef {
   imageUrl: string
 }
 
+/**
+ * A leaflet page's *display* image — deliberately a smaller variant than the
+ * one fetched for extraction, since a crop needs far less resolution than OCR.
+ */
+export interface PageDisplayImage {
+  imageUrl: string
+  width: number
+  height: number
+}
+
 export interface FetchedPageImage extends PageImageRef {
   imageBuffer: ArrayBuffer
+}
+
+/**
+ * Selects one source's entries out of a combined page registry. Page ids are
+ * prefixed by source precisely so a source's pages can be carried forward (or
+ * left behind) without knowing how the registry was assembled.
+ */
+export function selectPagesByPrefix(
+  pages: Record<string, LeafletPage> | undefined,
+  prefix: string,
+): Record<string, LeafletPage> {
+  return Object.fromEntries(Object.entries(pages ?? {}).filter(([pageId]) => pageId.startsWith(prefix)))
 }
 
 /** Fetches every page image, tolerating individual failures per the spec's partial-fetch requirement. */
@@ -24,7 +47,7 @@ export async function fetchPageImages(
   const results = await Promise.all(
     refs.map(async (ref): Promise<FetchedPageImage | null> => {
       try {
-        const imageBuffer = await ofetch<ArrayBuffer>(ref.imageUrl, { responseType: 'arrayBuffer' })
+        const imageBuffer = await ofetch(ref.imageUrl, { responseType: 'arrayBuffer' })
         return { ...ref, imageBuffer }
       } catch {
         return null

@@ -1,16 +1,25 @@
 import * as cheerio from 'cheerio'
 import { Type } from '@google/genai'
 import { ofetch } from 'ofetch'
-import type { Offer } from '../../../shared/types/offer'
+import type { BoundingBox2d, LeafletPage, Offer, OfferImageCrop } from '../../../shared/types/offer'
 import { readLastLidlLeafletSlug, readSnapshot, writeLastLidlLeafletSlug } from '../kv'
 import { computeOfferKey, computeProductKey } from '../normalize'
-import { extractStructuredDataFromImage, fetchPageImages, mapWithConcurrency, type PageImageRef } from './vision-extraction'
+import { rejectOverlappingBoxes, sanitizeBox } from './bounding-box'
+import {
+  extractStructuredDataFromImage,
+  fetchPageImages,
+  mapWithConcurrency,
+  selectPagesByPrefix,
+  type PageDisplayImage,
+  type PageImageRef,
+} from './vision-extraction'
 
 export const LIDL_LEAFLET_LISTING_URL = 'https://www.lidl.bg/c/broshura/s10020060'
 export const FLYER_API_URL = 'https://endpoints.leaflets.schwarz/v4/flyer'
 /** The weekly leaflet's validity period spans exactly this many days (Monday–Sunday). */
 export const WEEKLY_WINDOW_DAYS = 7
 export const LIDL_LEAFLET_SOURCE_URL_PREFIX = 'https://www.lidl.bg/l/bg/broshura/'
+export const LIDL_LEAFLET_PAGE_ID_PREFIX = 'lidl-leaflet:'
 export const VISION_CONCURRENCY = 4
 
 const VISION_MODEL = 'gemini-3.5-flash-lite'
@@ -26,7 +35,13 @@ export class LidlLeafletIngestionError extends Error {
 
 interface LidlFlyerPage {
   number: number
+  /** The largest signed variant; submitted for vision extraction. */
   zoom: string
+  /** A smaller signed variant; recorded for client-side crops. Unlisted sizes cannot be forged (see design.md). */
+  image: string
+  /** Original page dimensions — only their ratio is used, so no rescaling to the `image` variant is needed. */
+  width: number
+  height: number
 }
 
 interface LidlFlyer {
@@ -91,13 +106,31 @@ export async function selectWeeklyFlyer(
   return weekly[0]!
 }
 
-function toPageImageRefs(flyer: LidlFlyer): PageImageRef[] {
+interface LidlPageImageRef extends PageImageRef {
+  display: PageDisplayImage | null
+}
+
+function toPageImageRefs(flyer: LidlFlyer): LidlPageImageRef[] {
   return [...flyer.pages]
     .sort((a, b) => a.number - b.number)
-    .map((page) => ({ pageNumber: page.number, imageUrl: page.zoom }))
+    .map((page) => ({
+      pageNumber: page.number,
+      imageUrl: page.zoom,
+      display: page.image && page.width && page.height
+        ? { imageUrl: page.image, width: page.width, height: page.height }
+        : null,
+    }))
 }
 
 export interface LidlLeafletExtractedItem {
+  /**
+   * `[ymin, xmin, ymax, xmax]` normalized to 0–1000. snake_case deliberately,
+   * against the surrounding convention: it is the identifier Gemini models are
+   * trained on for detection, and renaming it costs accuracy for cosmetics.
+   */
+  box_2d: number[] | null
+  /** Whether the box tightly encloses exactly one product's photo; required for gating. */
+  boxConfident: boolean
   name: string
   brand: string | null
   unitText: string | null
@@ -114,11 +147,15 @@ export interface LidlLeafletExtractedItem {
 export interface LidlLeafletExtractedPage {
   pageNumber: number
   items: LidlLeafletExtractedItem[]
+  /** Absent when the page's display variant or its dimensions were unavailable; then no crops are emitted for it. */
+  display?: PageDisplayImage | null
 }
 
 const EXTRACTION_PROMPT = `You are reading one page of a Bulgarian supermarket (LIDL) weekly promotional leaflet.
 
 Identify every distinct product offer shown on this page. For each one, extract:
+- box_2d: the bounding box of the product's PHOTOGRAPH on this page, as [ymin, xmin, ymax, xmax] normalized to 0-1000. Box the photo of the product itself — not its price bubble, discount badge, or text block, and not the whole promotional tile. Use null if this offer has no photograph of its own.
+- boxConfident: true only if box_2d tightly encloses exactly one product's photograph. A box belongs to exactly one offer: if two offers share a single photograph, set box_2d to null for both of them rather than giving the same region to each.
 - name: the product name, in Bulgarian as printed
 - brand: the brand name if shown separately from the product name, else null
 - unitText: the pack size / net quantity text (e.g. "500 г", "1 л"), else null
@@ -141,6 +178,10 @@ const EXTRACTION_RESPONSE_SCHEMA = {
       items: {
         type: Type.OBJECT,
         properties: {
+          // No minItems/maxItems: they are string-typed in @google/genai, so the
+          // length is validated in `sanitizeBox` instead.
+          box_2d: { type: Type.ARRAY, items: { type: Type.INTEGER }, nullable: true },
+          boxConfident: { type: Type.BOOLEAN },
           name: { type: Type.STRING },
           brand: { type: Type.STRING, nullable: true },
           unitText: { type: Type.STRING, nullable: true },
@@ -151,7 +192,22 @@ const EXTRACTION_RESPONSE_SCHEMA = {
           priceConfident: { type: Type.BOOLEAN },
           uncertainFields: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
-        required: ['name', 'priceConfident', 'uncertainFields'],
+        // Localize before describing: with constrained decoding, describe-then-localize
+        // measurably degrades box quality.
+        propertyOrdering: [
+          'box_2d',
+          'boxConfident',
+          'name',
+          'brand',
+          'unitText',
+          'category',
+          'priceEurCents',
+          'originalPriceEurCents',
+          'discountPercentage',
+          'priceConfident',
+          'uncertainFields',
+        ],
+        required: ['name', 'priceConfident', 'boxConfident', 'uncertainFields'],
       },
     },
   },
@@ -176,6 +232,7 @@ function mapExtractedItem(
   flyer: LidlFlyer,
   sourceUrl: string,
   scrapedAt: string,
+  imageCrop: OfferImageCrop | null,
 ): Offer | null {
   if (!item.priceConfident || item.priceEurCents == null) return null
 
@@ -207,6 +264,7 @@ function mapExtractedItem(
     mechanic: 'standard',
     purchaseLimit: null,
     ean: null,
+    imageCrop,
     scope: 'national',
     store: null,
     validFrom: flyer.offerStartDate,
@@ -217,25 +275,87 @@ function mapExtractedItem(
   }
 }
 
+export function lidlLeafletPageId(slug: string, pageNumber: number): string {
+  return `${LIDL_LEAFLET_PAGE_ID_PREFIX}${slug}:${pageNumber}`
+}
+
 /**
- * Maps already-extracted, per-page structured data into `Offer[]`, applying
- * confidence gating (drop unless price is confident) and taking validity
- * dates from the leaflet's own metadata rather than the extracted item.
+ * Validates one page's proposed boxes and returns the survivors by item index.
+ * Runs before offers are built because overlap rejection is a page-wide
+ * judgement: two items claiming one photograph both lose it.
+ */
+function resolvePageBoxes(items: LidlLeafletExtractedItem[]): Map<number, BoundingBox2d> {
+  const candidates: { index: number; box: BoundingBox2d }[] = []
+
+  items.forEach((item, index) => {
+    if (!item.boxConfident) return
+    const box = sanitizeBox(item.box_2d)
+    if (box) candidates.push({ index, box })
+  })
+
+  return new Map(rejectOverlappingBoxes(candidates).map(({ index, box }) => [index, box]))
+}
+
+export interface ParseLidlLeafletExtractionResult {
+  offers: Offer[]
+  leafletPages: Record<string, LeafletPage>
+}
+
+export interface ParseLidlLeafletExtractionDeps {
+  logWarning?: (message: string) => void
+}
+
+/**
+ * Maps already-extracted, per-page structured data into offers plus the
+ * registry of leaflet pages their crops reference, applying confidence gating
+ * (drop unless price is confident) and taking validity dates from the leaflet's
+ * own metadata rather than the extracted item. A rejected bounding box never
+ * drops the offer — it only leaves it without an image.
  * Exported separately so tests can feed fixture extraction output without
  * calling the vision API.
  */
-export function parseLidlLeafletExtraction(pages: LidlLeafletExtractedPage[], flyer: LidlFlyer, sourceUrl: string): Offer[] {
+export function parseLidlLeafletExtraction(
+  pages: LidlLeafletExtractedPage[],
+  flyer: LidlFlyer,
+  sourceUrl: string,
+  slug: string,
+  deps: ParseLidlLeafletExtractionDeps = {},
+): ParseLidlLeafletExtractionResult {
   const scrapedAt = new Date().toISOString()
   const offers: Offer[] = []
+  const leafletPages: Record<string, LeafletPage> = {}
+
+  let proposedBoxes = 0
+  let keptBoxes = 0
 
   for (const page of pages) {
-    for (const item of page.items) {
-      const offer = mapExtractedItem(item, flyer, sourceUrl, scrapedAt)
-      if (offer) offers.push(offer)
-    }
+    const boxes = resolvePageBoxes(page.items)
+    const pageId = lidlLeafletPageId(slug, page.pageNumber)
+
+    page.items.forEach((item, index) => {
+      if (item.box_2d != null) proposedBoxes++
+
+      const box = page.display ? boxes.get(index) : undefined
+      const offer = mapExtractedItem(item, flyer, sourceUrl, scrapedAt, box ? { pageId, box } : null)
+      if (!offer) return
+
+      offers.push(offer)
+
+      if (offer.imageCrop && page.display) {
+        keptBoxes++
+        leafletPages[pageId] ??= { ...page.display, pageNumber: page.pageNumber, sourceUrl }
+      }
+    })
   }
 
-  return offers
+  const droppedBoxes = proposedBoxes - keptBoxes
+  if (droppedBoxes > 0 && deps.logWarning) {
+    deps.logWarning(
+      `Lidl leaflet ingestion: dropped ${droppedBoxes} of ${proposedBoxes} product image boxes (low confidence / failed sanity checks)`,
+    )
+  }
+
+  return { offers, leafletPages }
 }
 
 /** Distinguishes this source's offers from the XLSX-based Lidl source, both of which share `retailer: 'lidl'`. */
@@ -247,7 +367,9 @@ export interface FetchLidlLeafletOffersDeps {
   logWarning?: (message: string) => void
 }
 
-export async function fetchLidlLeafletOffers(deps: FetchLidlLeafletOffersDeps = {}): Promise<Offer[]> {
+export async function fetchLidlLeafletOffers(
+  deps: FetchLidlLeafletOffersDeps = {},
+): Promise<ParseLidlLeafletExtractionResult> {
   const logWarning = deps.logWarning ?? ((message: string) => console.warn(message))
 
   let listingHtml: string
@@ -268,7 +390,11 @@ export async function fetchLidlLeafletOffers(deps: FetchLidlLeafletOffersDeps = 
   const lastSlug = await readLastLidlLeafletSlug()
   if (lastSlug === slug) {
     const previous = await readSnapshot()
-    return previous?.offers.filter(isLidlLeafletOffer) ?? []
+    if (!previous) return { offers: [], leafletPages: {} }
+    return {
+      offers: previous.offers.filter(isLidlLeafletOffer),
+      leafletPages: selectPagesByPrefix(previous.leafletPages, LIDL_LEAFLET_PAGE_ID_PREFIX),
+    }
   }
 
   const pageRefs = toPageImageRefs(flyer)
@@ -284,18 +410,33 @@ export async function fetchLidlLeafletOffers(deps: FetchLidlLeafletOffersDeps = 
     )
   }
 
-  const extractionResults = await mapWithConcurrency(fetchedPages, VISION_CONCURRENCY, async (page) => {
-    try {
-      return { pageNumber: page.pageNumber, items: await extractOffersFromPageImage(page.imageBuffer) }
-    } catch (error) {
-      return { pageNumber: page.pageNumber, items: null, error }
-    }
-  })
+  const displayByPage = new Map(pageRefs.map((ref) => [ref.pageNumber, ref.display]))
+
+  type FailedPageExtraction = { pageNumber: number; items: null; error: unknown }
+  type PageExtraction = LidlLeafletExtractedPage | FailedPageExtraction
+
+  const extractionResults = await mapWithConcurrency<typeof fetchedPages[number], PageExtraction>(
+    fetchedPages,
+    VISION_CONCURRENCY,
+    async (page) => {
+      try {
+        return {
+          pageNumber: page.pageNumber,
+          display: displayByPage.get(page.pageNumber) ?? null,
+          items: await extractOffersFromPageImage(page.imageBuffer),
+        }
+      } catch (error) {
+        return { pageNumber: page.pageNumber, items: null, error }
+      }
+    },
+  )
 
   const extractedPages = extractionResults.filter(
     (result): result is LidlLeafletExtractedPage => result.items !== null,
   )
-  const failedExtractionPages = extractionResults.filter((result) => result.items === null)
+  const failedExtractionPages = extractionResults.filter(
+    (result): result is FailedPageExtraction => result.items === null,
+  )
 
   if (extractedPages.length === 0) {
     throw new LidlLeafletIngestionError('Vision extraction failed for every fetched leaflet page', {
@@ -309,9 +450,9 @@ export async function fetchLidlLeafletOffers(deps: FetchLidlLeafletOffersDeps = 
     )
   }
 
-  const offers = parseLidlLeafletExtraction(extractedPages, flyer, sourceUrl)
+  const result = parseLidlLeafletExtraction(extractedPages, flyer, sourceUrl, slug, { logWarning })
 
   await writeLastLidlLeafletSlug(slug)
 
-  return offers
+  return result
 }

@@ -4,6 +4,7 @@ import { readSnapshot } from '../utils/kv'
 const EMPTY_SNAPSHOT: DealsSnapshot = {
   offers: [],
   comparisons: [],
+  leafletPages: {},
   generatedAt: '',
   sources: {
     kaufland: { ok: false, scrapedAt: null },

@@ -28,6 +28,8 @@ describe('discoverPublicationUrl', () => {
 
 function makeItem(overrides: Partial<BillaExtractedPage['items'][number]> = {}): BillaExtractedPage['items'][number] {
   return {
+    box_2d: [100, 100, 300, 300],
+    boxConfident: true,
     name: 'Прясно мляко 3.6%',
     brand: 'Верея',
     unitText: '1 л',
@@ -44,12 +46,18 @@ function makeItem(overrides: Partial<BillaExtractedPage['items'][number]> = {}):
   }
 }
 
+const DISPLAY = { imageUrl: 'https://view.publitas.com/p/at800/page-3.jpg', width: 676, height: 947 }
+
+function makePage(items: BillaExtractedPage['items'], overrides: Partial<BillaExtractedPage> = {}): BillaExtractedPage {
+  return { pageNumber: 3, display: DISPLAY, items, ...overrides }
+}
+
 describe('parseBillaExtraction', () => {
   const publicationUrl = 'https://view.publitas.com/billa-bulgaria/bg_weekly_digital_leaflet_30-07-05-08-2026_cw31_web/'
+  const slug = 'bg_weekly_digital_leaflet_30-07-05-08-2026_cw31_web'
 
   it('emits an offer for a high-confidence extraction', () => {
-    const pages: BillaExtractedPage[] = [{ pageNumber: 3, items: [makeItem()] }]
-    const offers = parseBillaExtraction(pages, publicationUrl)
+    const { offers } = parseBillaExtraction([makePage([makeItem()])], publicationUrl, slug)
 
     expect(offers).toHaveLength(1)
     expect(offers[0]!.retailer).toBe('billa')
@@ -60,26 +68,100 @@ describe('parseBillaExtraction', () => {
   })
 
   it('drops an item whose price was not confidently extracted', () => {
-    const pages: BillaExtractedPage[] = [{ pageNumber: 3, items: [makeItem({ priceConfident: false })] }]
-    expect(parseBillaExtraction(pages, publicationUrl)).toHaveLength(0)
+    const pages = [makePage([makeItem({ priceConfident: false })])]
+    expect(parseBillaExtraction(pages, publicationUrl, slug).offers).toHaveLength(0)
   })
 
   it('drops an item whose validity dates were not confidently extracted', () => {
-    const pages: BillaExtractedPage[] = [{ pageNumber: 3, items: [makeItem({ validityConfident: false })] }]
-    expect(parseBillaExtraction(pages, publicationUrl)).toHaveLength(0)
+    const pages = [makePage([makeItem({ validityConfident: false })])]
+    expect(parseBillaExtraction(pages, publicationUrl, slug).offers).toHaveLength(0)
   })
 
   it('drops an item missing a price or validity date even if flagged confident', () => {
-    const pages: BillaExtractedPage[] = [{ pageNumber: 3, items: [makeItem({ priceEurCents: null })] }]
-    expect(parseBillaExtraction(pages, publicationUrl)).toHaveLength(0)
+    const pages = [makePage([makeItem({ priceEurCents: null })])]
+    expect(parseBillaExtraction(pages, publicationUrl, slug).offers).toHaveLength(0)
   })
 
   it('attaches a warning for offers with lower-confidence non-critical fields instead of dropping them', () => {
-    const pages: BillaExtractedPage[] = [{ pageNumber: 3, items: [makeItem({ uncertainFields: ['brand'] })] }]
-    const offers = parseBillaExtraction(pages, publicationUrl)
+    const { offers } = parseBillaExtraction([makePage([makeItem({ uncertainFields: ['brand'] })])], publicationUrl, slug)
 
     expect(offers).toHaveLength(1)
     expect(offers[0]!.warnings).toHaveLength(1)
     expect(offers[0]!.warnings[0]).toContain('brand')
+  })
+
+  it('populates imageCrop from a good box and registers the page it references', () => {
+    const { offers, leafletPages } = parseBillaExtraction([makePage([makeItem()])], publicationUrl, slug)
+
+    const pageId = `billa:${slug}:3`
+    expect(offers[0]!.imageCrop).toEqual({ pageId, box: [92, 92, 308, 308] })
+    expect(Object.keys(leafletPages)).toEqual([pageId])
+    expect(leafletPages[pageId]).toEqual({ ...DISPLAY, pageNumber: 3, sourceUrl: publicationUrl })
+  })
+
+  it('keeps the offer but drops the crop when the box is flagged unconfident', () => {
+    const { offers, leafletPages } = parseBillaExtraction(
+      [makePage([makeItem({ boxConfident: false })])],
+      publicationUrl,
+      slug,
+    )
+
+    expect(offers).toHaveLength(1)
+    expect(offers[0]!.imageCrop).toBeNull()
+    expect(leafletPages).toEqual({})
+  })
+
+  it('keeps the offer but drops the crop when the box fails sanity checks', () => {
+    const { offers } = parseBillaExtraction(
+      [makePage([makeItem({ box_2d: [300, 100, 100, 300] })])],
+      publicationUrl,
+      slug,
+    )
+
+    expect(offers).toHaveLength(1)
+    expect(offers[0]!.imageCrop).toBeNull()
+  })
+
+  it('drops the crop from both items of an overlapping pair, keeping both offers', () => {
+    const { offers, leafletPages } = parseBillaExtraction(
+      [
+        makePage([
+          makeItem({ name: 'Мляко', box_2d: [100, 100, 300, 300] }),
+          makeItem({ name: 'Сирене', box_2d: [110, 110, 310, 310] }),
+        ]),
+      ],
+      publicationUrl,
+      slug,
+    )
+
+    expect(offers).toHaveLength(2)
+    expect(offers.every((offer) => offer.imageCrop === null)).toBe(true)
+    expect(leafletPages).toEqual({})
+  })
+
+  it('emits no crop for a page whose display image is unavailable', () => {
+    const { offers, leafletPages } = parseBillaExtraction(
+      [makePage([makeItem()], { display: null })],
+      publicationUrl,
+      slug,
+    )
+
+    expect(offers).toHaveLength(1)
+    expect(offers[0]!.imageCrop).toBeNull()
+    expect(leafletPages).toEqual({})
+  })
+
+  it('reports dropped boxes as one aggregate line rather than per-offer warnings', () => {
+    const messages: string[] = []
+    const { offers } = parseBillaExtraction(
+      [makePage([makeItem(), makeItem({ name: 'Сирене', boxConfident: false })])],
+      publicationUrl,
+      slug,
+      { logWarning: (message) => messages.push(message) },
+    )
+
+    expect(messages).toHaveLength(1)
+    expect(messages[0]).toContain('dropped 1 of 2 product image boxes')
+    expect(offers.flatMap((offer) => offer.warnings)).toEqual([])
   })
 })

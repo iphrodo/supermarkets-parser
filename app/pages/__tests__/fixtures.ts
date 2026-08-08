@@ -24,6 +24,7 @@ export function makeOffer(index: number, retailer: Retailer = 'kaufland'): Offer
     purchaseLimit: null,
     ean: null,
     imageUrl: null,
+    imageCrop: null,
     scope: 'national',
     store: null,
     validFrom: '2026-01-01',
@@ -38,6 +39,7 @@ export function makeSnapshot(offers: Offer[], comparisons: ComparisonGroup[] = [
   return {
     offers,
     comparisons,
+    leafletPages: {},
     generatedAt: '2026-01-01T00:00:00.000Z',
     sources: {
       kaufland: { scrapedAt: '2026-01-01T00:00:00.000Z', ok: true },

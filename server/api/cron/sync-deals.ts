@@ -18,8 +18,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const result = await runDailySync({
-    fetchKauflandOffers,
-    fetchLidlOffers,
+    // Neither Kaufland nor the Lidl price list has leaflet pages to publish.
+    fetchKauflandOffers: async () => ({ offers: await fetchKauflandOffers() }),
+    fetchLidlOffers: async () => ({ offers: await fetchLidlOffers() }),
     fetchLidlLeafletOffers,
     fetchBillaOffers,
     readSnapshot,

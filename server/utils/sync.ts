@@ -1,20 +1,29 @@
 import type { ComparisonGroup } from '../../shared/types/comparison'
-import type { DealsSnapshot, Offer } from '../../shared/types/offer'
+import type { DealsSnapshot, LeafletPage, Offer } from '../../shared/types/offer'
 import { mergeCatalog } from './catalog'
 import { buildComparisons } from './comparison'
 import type { ProductTypeAssignments, ProductTypeVocabulary } from './kv'
 import { classifyOffers as classifyOffersImpl, defaultClassifyOffersDeps } from './product-type'
+import { BILLA_PAGE_ID_PREFIX } from './scrapers/billa'
 import { isLidlXlsxOffer } from './scrapers/lidl'
-import { isLidlLeafletOffer } from './scrapers/lidl-leaflet'
+import { isLidlLeafletOffer, LIDL_LEAFLET_PAGE_ID_PREFIX } from './scrapers/lidl-leaflet'
+import { selectPagesByPrefix } from './scrapers/vision-extraction'
 
 export interface ClassifiedTypes {
   vocabulary: ProductTypeVocabulary
   assignments: ProductTypeAssignments
 }
 
+/** Leaflet sources also publish the pages their offers' crops reference; the others omit it. */
+export interface SourceIngestResult {
+  offers: Offer[]
+  leafletPages?: Record<string, LeafletPage>
+}
+
 interface SourceResult {
   ok: boolean
   offers: Offer[]
+  leafletPages: Record<string, LeafletPage>
   scrapedAt: string | null
   error?: unknown
 }
@@ -24,16 +33,18 @@ type SourceKey = keyof DealsSnapshot['sources']
 interface SourceConfig {
   key: SourceKey
   label: string
-  fetch: () => Promise<Offer[]>
+  fetch: () => Promise<SourceIngestResult>
   /** Identifies this source's own offers within a previous snapshot, distinguishing it from any other source sharing the same retailer. */
   belongsToSource: (offer: Offer) => boolean
+  /** Key prefix identifying this source's own pages in a previous snapshot's registry; absent for sources without leaflet pages. */
+  pageIdPrefix?: string
 }
 
 export interface RunSyncDeps {
-  fetchKauflandOffers: () => Promise<Offer[]>
-  fetchLidlOffers: () => Promise<Offer[]>
-  fetchLidlLeafletOffers: () => Promise<Offer[]>
-  fetchBillaOffers: () => Promise<Offer[]>
+  fetchKauflandOffers: () => Promise<SourceIngestResult>
+  fetchLidlOffers: () => Promise<SourceIngestResult>
+  fetchLidlLeafletOffers: () => Promise<SourceIngestResult>
+  fetchBillaOffers: () => Promise<SourceIngestResult>
   readSnapshot: () => Promise<DealsSnapshot | null>
   writeSnapshot: (snapshot: DealsSnapshot) => Promise<void>
   /** Injectable so tests never touch the network; defaults to the real model-backed classifier. */
@@ -48,13 +59,31 @@ export interface RunSyncResult {
   snapshot: DealsSnapshot | null
 }
 
-async function runSource(fetcher: () => Promise<Offer[]>): Promise<SourceResult> {
+async function runSource(fetcher: () => Promise<SourceIngestResult>): Promise<SourceResult> {
   try {
-    const offers = await fetcher()
-    return { ok: true, offers, scrapedAt: offers[0]?.scrapedAt ?? new Date().toISOString() }
+    const { offers, leafletPages } = await fetcher()
+    return {
+      ok: true,
+      offers,
+      leafletPages: leafletPages ?? {},
+      scrapedAt: offers[0]?.scrapedAt ?? new Date().toISOString(),
+    }
   } catch (error) {
-    return { ok: false, offers: [], scrapedAt: null, error }
+    return { ok: false, offers: [], leafletPages: {}, scrapedAt: null, error }
   }
+}
+
+/**
+ * Keeps only the pages a surviving offer's crop actually points at. Without
+ * this, one superseded leaflet's pages would accumulate in the snapshot every
+ * week, and a carried-forward source would drag its whole registry along.
+ */
+function pruneUnreferencedPages(
+  pages: Record<string, LeafletPage>,
+  offers: Offer[],
+): Record<string, LeafletPage> {
+  const referenced = new Set(offers.map((offer) => offer.imageCrop?.pageId).filter((id): id is string => Boolean(id)))
+  return Object.fromEntries(Object.entries(pages).filter(([pageId]) => referenced.has(pageId)))
 }
 
 /**
@@ -72,8 +101,20 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
   const sources: SourceConfig[] = [
     { key: 'kaufland', label: 'Kaufland', fetch: deps.fetchKauflandOffers, belongsToSource: (o) => o.retailer === 'kaufland' },
     { key: 'lidl', label: 'Lidl', fetch: deps.fetchLidlOffers, belongsToSource: isLidlXlsxOffer },
-    { key: 'lidlLeaflet', label: 'Lidl leaflet', fetch: deps.fetchLidlLeafletOffers, belongsToSource: isLidlLeafletOffer },
-    { key: 'billa', label: 'Billa', fetch: deps.fetchBillaOffers, belongsToSource: (o) => o.retailer === 'billa' },
+    {
+      key: 'lidlLeaflet',
+      label: 'Lidl leaflet',
+      fetch: deps.fetchLidlLeafletOffers,
+      belongsToSource: isLidlLeafletOffer,
+      pageIdPrefix: LIDL_LEAFLET_PAGE_ID_PREFIX,
+    },
+    {
+      key: 'billa',
+      label: 'Billa',
+      fetch: deps.fetchBillaOffers,
+      belongsToSource: (o) => o.retailer === 'billa',
+      pageIdPrefix: BILLA_PAGE_ID_PREFIX,
+    },
   ]
 
   const results = await Promise.all(sources.map((source) => runSource(source.fetch)))
@@ -94,7 +135,18 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
     return result.ok ? result.offers : (previous?.offers.filter(source.belongsToSource) ?? [])
   })
 
+  // A carried-forward offer's crop points at a page published alongside it, so
+  // the pages come forward too — but only the failed source's, never the pages
+  // a succeeding source has already superseded.
+  const pagesBySource = sources.map((source, index) => {
+    const result = results[index]!
+    if (result.ok) return result.leafletPages
+    if (!source.pageIdPrefix) return {}
+    return selectPagesByPrefix(previous?.leafletPages, source.pageIdPrefix)
+  })
+
   const merged = mergeCatalog(...offersBySource)
+  const leafletPages = pruneUnreferencedPages(Object.assign({}, ...pagesBySource), merged.offers)
 
   const classify = deps.classifyOffers ?? ((offers) => classifyOffersImpl(offers, defaultClassifyOffersDeps()))
 
@@ -120,6 +172,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
   const snapshot: DealsSnapshot = {
     offers: merged.offers,
     comparisons,
+    leafletPages,
     generatedAt: now().toISOString(),
     sources: sourcesBlock,
   }

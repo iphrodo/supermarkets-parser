@@ -188,7 +188,7 @@ export function isLidlXlsxOffer(offer: Offer): boolean {
 export async function fetchLidlOffers(): Promise<Offer[]> {
   let buffer: ArrayBuffer
   try {
-    buffer = await ofetch<ArrayBuffer>(LIDL_EXPORT_URL, { responseType: 'arrayBuffer' })
+    buffer = await ofetch(LIDL_EXPORT_URL, { responseType: 'arrayBuffer' })
   } catch (error) {
     throw new LidlIngestionError('Failed to download Lidl XLSX export', { cause: error })
   }
