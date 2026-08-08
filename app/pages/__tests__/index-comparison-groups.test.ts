@@ -14,7 +14,7 @@ afterEach(() => {
 })
 
 describe('comparison landing page: rendering', () => {
-  it('renders comparison groups ordered by savings, with the cheapest row marked', async () => {
+  it('renders comparison groups, leading each with its cheapest per-unit price and both savings figures', async () => {
     const offers = [makeOffer(0, 'kaufland'), makeOffer(1, 'lidl')]
     const group = makeComparisonGroup({
       groupKey: 'chicken-breast',
@@ -31,6 +31,7 @@ describe('comparison landing page: rendering', () => {
 
     expect(wrapper.findAll('article')).toHaveLength(1)
     expect(wrapper.text()).toContain('Пилешко филе')
-    expect(wrapper.text()).toContain('Cheapest')
+    expect(wrapper.text()).toContain('8.00 €/кг')
+    expect(wrapper.text()).toContain('Спести 20% · 2.00 €/кг')
   })
 })

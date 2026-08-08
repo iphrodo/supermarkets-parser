@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { LeafletPage, Offer } from '../../shared/types/offer'
+import { LOYALTY_LABELS, MECHANIC_LABELS, RETAILER_LABELS, formatBgn, formatDate, formatEur } from '../utils/format'
 import ProductThumb from './ProductThumb.vue'
 
 const props = withDefaults(
@@ -12,47 +13,9 @@ const props = withDefaults(
   { page: null },
 )
 
-const RETAILER_LABELS: Record<Offer['retailer'], string> = {
-  kaufland: 'Kaufland',
-  lidl: 'Lidl',
-  billa: 'Billa',
-}
-
 const retailerLabel = computed(() => RETAILER_LABELS[props.offer.retailer])
-
-const loyaltyLabel = computed(() => {
-  switch (props.offer.loyaltyTier) {
-    case 'kaufland_card_xtra':
-      return 'Kaufland Card Xtra'
-    case 'kaufland_card':
-      return 'Kaufland Card'
-    default:
-      return null
-  }
-})
-
-const mechanicLabel = computed(() => {
-  switch (props.offer.mechanic) {
-    case 'buy_1_get_1_free':
-      return '1+1 free'
-    case 'buy_2_get_1_free':
-      return '2+1 free'
-    default:
-      return null
-  }
-})
-
-function formatCents(cents: number): string {
-  return (cents / 100).toFixed(2)
-}
-
-function formatDate(isoDate: string): string {
-  const date = new Date(isoDate)
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const year = date.getFullYear()
-  return `${day}.${month}.${year}`
-}
+const loyaltyLabel = computed(() => LOYALTY_LABELS[props.offer.loyaltyTier])
+const mechanicLabel = computed(() => MECHANIC_LABELS[props.offer.mechanic])
 </script>
 
 <template>
@@ -79,12 +42,12 @@ function formatDate(isoDate: string): string {
     </div>
 
     <div class="flex items-baseline gap-2">
-      <span class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ formatCents(offer.priceEurCents) }} €</span>
+      <span class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ formatEur(offer.priceEurCents) }}</span>
       <span v-if="offer.originalPriceEurCents" class="text-sm text-gray-400 line-through">
-        {{ formatCents(offer.originalPriceEurCents) }} €
+        {{ formatEur(offer.originalPriceEurCents) }}
       </span>
       <span v-if="offer.priceBgnCents" class="text-xs text-gray-500 dark:text-gray-400">
-        ({{ formatCents(offer.priceBgnCents) }} ЛВ.)
+        ({{ formatBgn(offer.priceBgnCents) }})
       </span>
     </div>
 
@@ -105,12 +68,12 @@ function formatDate(isoDate: string): string {
 
     <p v-if="offer.purchaseLimit" class="text-xs text-gray-500 dark:text-gray-400">{{ offer.purchaseLimit }}</p>
 
-    <p class="text-xs text-gray-500 dark:text-gray-400">Valid until {{ formatDate(offer.validUntil) }}</p>
+    <p class="text-xs text-gray-500 dark:text-gray-400">Валидна до {{ formatDate(offer.validUntil) }}</p>
 
     <div class="mt-auto flex items-center justify-between border-t border-gray-100 pt-2 text-xs text-gray-400 dark:border-gray-800">
       <span>{{ offer.category }}{{ offer.campaign ? ` · ${offer.campaign}` : '' }}</span>
       <a :href="offer.sourceUrl" target="_blank" rel="noopener" class="underline hover:text-gray-600 dark:hover:text-gray-300">
-        Source
+        Източник
       </a>
     </div>
   </article>

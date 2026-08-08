@@ -35,15 +35,15 @@ const generatedAtLabel = computed(() =>
 <template>
   <div class="mx-auto max-w-6xl px-4 py-8">
     <header class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">This week's deals</h1>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Оферти тази седмица</h1>
       <p v-if="generatedAtLabel" class="text-sm text-gray-500 dark:text-gray-400">
-        Snapshot last updated {{ generatedAtLabel }}
+        Обновено на {{ generatedAtLabel }}
       </p>
     </header>
 
     <DealsFilterBar v-model="filter" :categories="categories" class="mb-6" />
 
-    <p v-if="!filteredOffers.length" class="text-gray-500 dark:text-gray-400">No offers match these filters yet.</p>
+    <p v-if="!filteredOffers.length" class="text-gray-500 dark:text-gray-400">Няма оферти по тези филтри.</p>
 
     <template v-else>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -56,10 +56,10 @@ const generatedAtLabel = computed(() =>
       </div>
 
       <div v-if="hasMore" ref="sentinel" class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
-        Loading more offers…
+        Зареждане…
       </div>
       <p v-else class="py-6 text-center text-sm text-gray-400 dark:text-gray-500">
-        You've reached the end of the list.
+        Това е краят на списъка.
       </p>
     </template>
   </div>

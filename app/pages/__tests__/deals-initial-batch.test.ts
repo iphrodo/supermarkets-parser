@@ -20,6 +20,6 @@ describe('deals page infinite scroll: initial load', () => {
     const wrapper = await mountSuspended(DealsPage)
 
     expect(wrapper.findAll('article')).toHaveLength(BATCH_SIZE)
-    expect(wrapper.text()).toContain('Loading more offers')
+    expect(wrapper.text()).toContain('Зареждане')
   })
 })

@@ -19,9 +19,9 @@ describe('deals page infinite scroll: empty results', () => {
 
     const wrapper = await mountSuspended(DealsPage)
 
-    expect(wrapper.text()).toContain('No offers match these filters yet.')
+    expect(wrapper.text()).toContain('Няма оферти по тези филтри.')
     expect(wrapper.findAll('article')).toHaveLength(0)
-    expect(wrapper.text()).not.toContain('Loading more offers')
-    expect(wrapper.text()).not.toContain("You've reached the end of the list.")
+    expect(wrapper.text()).not.toContain('Зареждане')
+    expect(wrapper.text()).not.toContain("Това е краят на списъка.")
   })
 })

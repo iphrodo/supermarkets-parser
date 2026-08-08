@@ -8,14 +8,14 @@
           class="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
           active-class="text-blue-600 dark:text-blue-400"
         >
-          Compare prices
+          Сравнение на цени
         </NuxtLink>
         <NuxtLink
           to="/deals"
           class="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
           active-class="text-blue-600 dark:text-blue-400"
         >
-          All offers
+          Всички оферти
         </NuxtLink>
       </div>
     </nav>

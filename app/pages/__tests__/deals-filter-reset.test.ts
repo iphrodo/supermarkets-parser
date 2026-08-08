@@ -32,6 +32,6 @@ describe('deals page infinite scroll: filter reset', () => {
     await wrapper.vm.$nextTick()
 
     expect(wrapper.findAll('article')).toHaveLength(5)
-    expect(wrapper.text()).toContain("You've reached the end of the list.")
+    expect(wrapper.text()).toContain("Това е краят на списъка.")
   })
 })

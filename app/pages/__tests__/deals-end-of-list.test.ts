@@ -20,7 +20,7 @@ describe('deals page infinite scroll: end of list', () => {
     const wrapper = await mountSuspended(DealsPage)
 
     expect(wrapper.findAll('article')).toHaveLength(BATCH_SIZE - 1)
-    expect(wrapper.text()).toContain("You've reached the end of the list.")
-    expect(wrapper.text()).not.toContain('Loading more offers')
+    expect(wrapper.text()).toContain("Това е краят на списъка.")
+    expect(wrapper.text()).not.toContain('Зареждане')
   })
 })
