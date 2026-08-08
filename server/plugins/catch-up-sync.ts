@@ -3,7 +3,7 @@ import { mostRecentSyncWindow } from '../utils/schedule'
 import { fetchBillaOffers } from '../utils/scrapers/billa'
 import { fetchKauflandOffers } from '../utils/scrapers/kaufland'
 import { fetchLidlOffers } from '../utils/scrapers/lidl'
-import { fetchLidlLeafletOffers } from '../utils/scrapers/lidl-leaflet'
+import { fetchLidlSiteOffers } from '../utils/scrapers/lidl-site'
 import { runDailySync } from '../utils/sync'
 
 /**
@@ -25,10 +25,10 @@ async function runCatchUpSync() {
 
   console.log(`Running catch-up sync for missed window ${window.toISOString()}`)
   await runDailySync({
-    // Neither Kaufland nor the Lidl price list has leaflet pages to publish.
+    // Only Billa publishes leaflet pages; the other sources have none.
     fetchKauflandOffers: async () => ({ offers: await fetchKauflandOffers() }),
     fetchLidlOffers: async () => ({ offers: await fetchLidlOffers() }),
-    fetchLidlLeafletOffers,
+    fetchLidlSiteOffers: async () => ({ offers: await fetchLidlSiteOffers() }),
     fetchBillaOffers,
     readSnapshot,
     writeSnapshot,

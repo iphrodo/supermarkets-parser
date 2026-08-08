@@ -4,7 +4,6 @@ import type { UnitBase } from '../../shared/types/comparison'
 
 const SNAPSHOT_KEY = 'deals:snapshot'
 const BILLA_PUBLICATION_SLUG_KEY = 'billa:last-publication-slug'
-const LIDL_LEAFLET_SLUG_KEY = 'lidl-leaflet:last-slug'
 const PRODUCT_TYPE_VOCABULARY_KEY = 'product-types:vocabulary'
 const PRODUCT_TYPE_ASSIGNMENTS_KEY = 'product-types:assignments'
 
@@ -55,17 +54,6 @@ export async function readLastBillaPublicationSlug(): Promise<string | null> {
 export async function writeLastBillaPublicationSlug(slug: string): Promise<void> {
   const redis = getRedisClient()
   await redis.set(BILLA_PUBLICATION_SLUG_KEY, slug)
-}
-
-export async function readLastLidlLeafletSlug(): Promise<string | null> {
-  const redis = getRedisClient()
-  const slug = await redis.get<string>(LIDL_LEAFLET_SLUG_KEY)
-  return slug ?? null
-}
-
-export async function writeLastLidlLeafletSlug(slug: string): Promise<void> {
-  const redis = getRedisClient()
-  await redis.set(LIDL_LEAFLET_SLUG_KEY, slug)
 }
 
 export async function readProductTypeVocabulary(): Promise<ProductTypeVocabulary> {

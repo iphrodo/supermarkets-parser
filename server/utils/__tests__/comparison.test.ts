@@ -59,18 +59,18 @@ describe('buildComparisons', () => {
         sourceUrl: 'https://www.lidl.bg/explore/assets/webPriceData/bg/ExportSecondList.xlsx',
       }),
       makeOffer({
-        offerKey: 'lidl-leaflet',
-        productKey: 'lidl-leaflet',
+        offerKey: 'lidl-site',
+        productKey: 'lidl-site',
         retailer: 'lidl',
         priceEurCents: 400,
-        sourceUrl: 'https://www.lidl.bg/l/bg/broshura/lidl-bg-kw32-2026-08-03/ar/0',
+        sourceUrl: 'https://www.lidl.bg/p/milbona-kaskaval/p10060798',
       }),
     ]
     const vocabulary: ProductTypeVocabulary = [CHICKEN_TYPE]
     const assignments: ProductTypeAssignments = {
       'kaufland-1': 'chicken-breast',
       'lidl-pricelist': 'chicken-breast',
-      'lidl-leaflet': 'chicken-breast',
+      'lidl-site': 'chicken-breast',
     }
 
     const groups = buildComparisons(offers, vocabulary, assignments)
@@ -78,7 +78,7 @@ describe('buildComparisons', () => {
     expect(groups).toHaveLength(1)
     expect(groups[0]!.entries).toHaveLength(2)
     const lidlEntry = groups[0]!.entries.find((e) => e.retailer === 'lidl')
-    expect(lidlEntry?.offerKey).toBe('lidl-leaflet')
+    expect(lidlEntry?.offerKey).toBe('lidl-site')
   })
 
   it('drops an entry above 10x the group median and records a warning', () => {

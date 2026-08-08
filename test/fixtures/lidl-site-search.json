@@ -1,0 +1,1681 @@
+{
+  "type": "search",
+  "version": "v2.0.0",
+  "locale": "bg_BG",
+  "assortment": "BG",
+  "resultType": "PRODUCT",
+  "numFound": 18,
+  "offset": 0,
+  "fetchsize": 15,
+  "maxfetchsize": 1000,
+  "items": [
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "showBrand": false
+          },
+          "canonicalPath": "/p/p'lnoz'rnest-klyb-s-kvas/p10060682",
+          "canonicalUrl": "/p/p'lnoz'rnest-klyb-s-kvas/p10060682",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060682",
+          "flashSales": false,
+          "fullTitle": "Пълнозърнест хляб с квас",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "7208092"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/JliDPohsI0Lzr0WXUqmudluFrDSD-0NYLDVZYbDD2ko/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS84MjFGMTUyNjIzM0REMDU5MkQxQkE2NEE/yQkY2MTJEMEQyQ0VDN0U3QkY0OEU2MDhGNUIyNzMzMzNEMTUxMTM4LnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060682,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "Пълнозърнест хляб с квас",
+            "moreDetails": "Допълнителна информация",
+            "title": "Пълнозърнест хляб с квас",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Хляб и тестени изделия/Прясно изпечен хляб",
+            "wonCategoryPrimaryPath": "0/17/1740/174010"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "deletedPrice": 1.35,
+              "deletedPriceSecond": 2.64,
+              "discountHasStar": false,
+              "discountText": "-51%",
+              "fromRecommendedPrice": false,
+              "hideBargainHint": false,
+              "bargainHintEnabled": false,
+              "bargainHintText": "BargainHint_Text",
+              "percentageDiscount": 51,
+              "showDiscount": true,
+              "showFrom": false,
+              "showPercentage": true,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 1.35,
+            "oldPriceSecond": 2.64,
+            "packaging": {
+              "text": "500 g/бр."
+            },
+            "price": 0.65,
+            "priceSecond": 1.27,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060682,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747708,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Пълнозърнест  хляб с квас",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "MILBONA",
+            "url": "/q/search?q=milbona+",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/milbona-kaskaval/p10060798",
+          "canonicalUrl": "/p/milbona-kaskaval/p10060798",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060798",
+          "flashSales": false,
+          "fullTitle": "MILBONA Кашкавал",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "162843"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/krz14_r-0qGQe3anRdC7DOM8W_T5w7N2QcNt09g9Gqk/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS9FQ0YwQkEwRDhGNEUyRkRCQTRBQUM3NjY/wRDU5RDJBOEYzRDY5MDMzRDU2ODAwNDIwNjAxNzUwQ0ZDMTA3QTQzLnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060798,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "MILBONA Кашкавал",
+            "moreDetails": "Допълнителна информация",
+            "title": "Кашкавал",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Сирена, млечни продукти и яйца/Сирене и кашкавал",
+            "wonCategoryPrimaryPath": "0/17/1739/173912"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "discountHasStar": false,
+              "discountText": "34% по-евтино",
+              "fromRecommendedPrice": false,
+              "showDiscount": false,
+              "showFrom": false,
+              "showPercentage": false,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0,
+            "oldPriceSecond": 0,
+            "packaging": {
+              "text": "1.5 кg/опаковка"
+            },
+            "price": 9.99,
+            "priceSecond": 19.54,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060798,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747709,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Кашкавал",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "MEAT REVOLUTION",
+            "url": "/q/search?q=meat+revolution",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/meat-revolution-svinski-rebra-spare-ribs/p10060684",
+          "canonicalUrl": "/p/meat-revolution-svinski-rebra-spare-ribs/p10060684",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060684",
+          "flashSales": false,
+          "fullTitle": "MEAT REVOLUTION Свински ребра Spare ribs",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "7206535"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/L9JbnGG0x2R8yrj4i3LgmoW1n-9G1KWSzaMixXl14_8/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS85RUM4NDVFNTUyREJFQTYzMDc4ODgzNEV/BQkJFNTI4OUM3RjJFRDc3OTcwNkZCMjY1OTM5NjM5OUMwMDVENjU3LnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060684,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "MEAT REVOLUTION Свински ребра Spare ribs",
+            "moreDetails": "Допълнителна информация",
+            "title": "Свински ребра Spare ribs",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Месо и птиче месо/Свинско месо",
+            "wonCategoryPrimaryPath": "0/17/1738/173812"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "discountHasStar": false,
+              "discountText": "Акция",
+              "fromRecommendedPrice": false,
+              "showDiscount": false,
+              "showFrom": false,
+              "showPercentage": false,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0,
+            "oldPriceSecond": 0,
+            "packaging": {
+              "text": "за kg"
+            },
+            "price": 10.22,
+            "priceSecond": 19.99,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060684,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747708,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Свински ребра Spare ribs ",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "РОДНА СТРЯХА",
+            "url": "/q/search?q=%D1%80%D0%BE%D0%B4%D0%BD%D0%B0+%D1%81%D1%82%D1%80%D1%8F%D1%85%D0%B0",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/rodna-stryka-grozdova-rakiy-xxl/p10060733",
+          "canonicalUrl": "/p/rodna-stryka-grozdova-rakiy-xxl/p10060733",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060733",
+          "flashSales": false,
+          "fullTitle": "РОДНА СТРЯХА Гроздова ракия XXL",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "7207407"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/sMKnbZ3WD1rjXuR3PjgWNrdJqzWrU3N-OW8-pS7kJlk/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS80QjdENTc4NDA4MUQ0NTBBRTRBRTc3NDQ/5NkIxQjBBNDEyMTQwODQ0MzY0MDczRUUyMUU2NzA0Qzc0NTI2OEJELnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060733,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "РОДНА СТРЯХА Гроздова ракия XXL",
+            "moreDetails": "Допълнителна информация",
+            "title": "Гроздова ракия XXL",
+            "wonCategoryPrimary": "Светове на нуждата/Вино, бира и спиртни напитки/Спиртни напитки/Ракия и др.",
+            "wonCategoryPrimaryPath": "0/10/1011/101114"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "discountHasStar": false,
+              "discountText": "22% по-евтино",
+              "fromRecommendedPrice": false,
+              "showDiscount": false,
+              "showFrom": false,
+              "showPercentage": false,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0,
+            "oldPriceSecond": 0,
+            "packaging": {
+              "text": "1.5 l/опаковка"
+            },
+            "price": 9.15,
+            "priceSecond": 17.9,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060733,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747709,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Гроздова ракия XXL",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "СЛЪНЧО",
+            "url": "/q/search?q=%D1%81%D0%BB%D1%8A%D0%BD%D1%87%D0%BE",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/sl'nco-pseniceni-pr'citi-xxl/p10060717",
+          "canonicalUrl": "/p/sl'nco-pseniceni-pr'citi-xxl/p10060717",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060717",
+          "flashSales": false,
+          "fullTitle": "СЛЪНЧО Пшеничени пръчици XXL",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "7202026"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/5NiGVWV1xAZiw6LSSLPBsQLWL8fvsjBZ0sc8kuw4AZo/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS8wMkY5MEVBODk3OTA1RjEzQzBENzk5RTc/2NjJBRDZERTE1MzNCQzIwNjgyNTk5REZCMEMzODI1NkQ3MTg2NDM1LnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060717,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "СЛЪНЧО Пшеничени пръчици XXL",
+            "moreDetails": "Допълнителна информация",
+            "title": "Пшеничени пръчици XXL",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Снаксове и сладки изкушения/Чипсове и снаксове",
+            "wonCategoryPrimaryPath": "0/17/1744/174411"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "discountHasStar": false,
+              "discountText": "27% безплатно",
+              "fromRecommendedPrice": false,
+              "showDiscount": false,
+              "showFrom": false,
+              "showPercentage": false,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0,
+            "oldPriceSecond": 0,
+            "packaging": {
+              "text": "60 g/опаковка"
+            },
+            "price": 0.28,
+            "priceSecond": 0.55,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060717,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747709,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Пшеничени пръчици XXL",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "showBrand": false
+          },
+          "canonicalPath": "/p/bretel/p10060690",
+          "canonicalUrl": "/p/bretel/p10060690",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060690",
+          "flashSales": false,
+          "fullTitle": "Брецел",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "99773"
+          ],
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060690,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "Брецел",
+            "moreDetails": "Допълнителна информация",
+            "title": "Брецел",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Хляб и тестени изделия/Солени закуски",
+            "wonCategoryPrimaryPath": "0/17/1740/174013"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "deletedPrice": 0.66,
+              "deletedPriceSecond": 1.29,
+              "discountHasStar": false,
+              "discountText": "-31%",
+              "fromRecommendedPrice": false,
+              "hideBargainHint": false,
+              "bargainHintEnabled": false,
+              "bargainHintText": "BargainHint_Text",
+              "percentageDiscount": 31,
+              "showDiscount": true,
+              "showFrom": false,
+              "showPercentage": true,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0.66,
+            "oldPriceSecond": 1.29,
+            "packaging": {
+              "text": "100 g/бр."
+            },
+            "price": 0.45,
+            "priceSecond": 0.88,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060690,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747708,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Брецел",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "showBrand": false
+          },
+          "canonicalPath": "/p/pura/p10060691",
+          "canonicalUrl": "/p/pura/p10060691",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060691",
+          "flashSales": false,
+          "fullTitle": "Пура",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "7208976"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/iuPIUhLIeK7CRl1vnYeZYoYMtOrwcJECJqLKCQGdikY/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS85MEU4QzhGQjQxMThDNzMxNUY4MzRGMEY/wNkU1MkJCQUFEMTY4N0ExNDRCQjhBQkExRDQ4MTIzRjUwREEwNUYwLnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060691,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "Пура",
+            "moreDetails": "Допълнителна информация",
+            "title": "Пура",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Хляб и тестени изделия/Солени закуски",
+            "wonCategoryPrimaryPath": "0/17/1740/174013"
+          },
+          "lidlPlus": [
+            {
+              "price": {
+                "price": 0.19,
+                "priceSecond": 0.37,
+                "discount": {
+                  "discountText": "-63%",
+                  "percentageDiscount": 63
+                }
+              }
+            }
+          ],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "deletedPrice": 0.51,
+              "deletedPriceSecond": 1,
+              "discountHasStar": false,
+              "discountText": "-47%",
+              "fromRecommendedPrice": false,
+              "hideBargainHint": false,
+              "bargainHintEnabled": false,
+              "bargainHintText": "BargainHint_Text",
+              "percentageDiscount": 47,
+              "showDiscount": true,
+              "showFrom": false,
+              "showPercentage": true,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0.51,
+            "oldPriceSecond": 1,
+            "packaging": {
+              "text": "90 g/бр."
+            },
+            "price": 0.27,
+            "priceSecond": 0.53,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060691,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747708,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Пура",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "DIAMANT",
+            "url": "/q/search?q=diamant",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/diamant-zakar/p10060680",
+          "canonicalUrl": "/p/diamant-zakar/p10060680",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060680",
+          "flashSales": false,
+          "fullTitle": "DIAMANT Захар",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "185227"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/6XbNxhZHZPh03dprZl27ZGnGXRVpo2rlIUtUi4HaMGQ/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS9FRDQ4RThEMjhFMTI0RTk5Mjc0MTg3REQ/2RkRFRjM2QkU1RTEyQ0I1ODU3OEM2ODZENERBQ0FEQ0NFRjIyNzI0LnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060680,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "DIAMANT Захар",
+            "moreDetails": "Допълнителна информация",
+            "title": "Захар",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Основни храни/Продукти за печене и готвене - брашно, захар",
+            "wonCategoryPrimaryPath": "0/17/1741/174112"
+          },
+          "lidlPlus": [
+            {
+              "price": {
+                "basePrice": {
+                  "prefix": false
+                },
+                "discount": {
+                  "deletedPrice": 5.59,
+                  "deletedPriceSecond": 10.93,
+                  "discountHasStar": false,
+                  "discountText": "по-евтино",
+                  "fromNormalPriceForLidlPlus": false,
+                  "fromRecommendedPrice": false,
+                  "hideBargainHint": false,
+                  "bargainHintEnabled": false,
+                  "bargainHintText": "BargainHint_Text",
+                  "showDiscount": true,
+                  "showFrom": false,
+                  "showPercentage": false,
+                  "showUpTo": false
+                },
+                "displayedCurrency": "€",
+                "displayedCurrencySecond": "ЛВ.",
+                "hasStar": true,
+                "hasVat": false,
+                "oldPrice": 5.59,
+                "oldPriceSecond": 10.93,
+                "packaging": {
+                  "text": "10 х 1 kg/опаковка"
+                },
+                "price": 5.39,
+                "priceSecond": 10.54,
+                "priceTheme": "white_yellow",
+                "specialTaxes": []
+              },
+              "lidlPlusText": "С Lidl Plus",
+              "highlightText": "по-евтино"
+            }
+          ],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060680,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747708,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Захар",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "VITASIA",
+            "url": "/q/search?q=vitasia",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/vitasia-skaridi/p10060754",
+          "canonicalUrl": "/p/vitasia-skaridi/p10060754",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060754",
+          "flashSales": false,
+          "fullTitle": "VITASIA Скариди",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "119286"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/3F1U1o7ibGhuLEgBfNyPUUENOcDCYWDaqzpeRQ9hRsE/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS8xNkQ1NTdBNURFMTk0M0M1RTJEOTYxQjg/2NDRFRjY5RTkwQkZCMkQ1RURFQTUwM0MxRThGNUNFQTM3RTg4RDZCLnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060754,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "VITASIA Скариди",
+            "moreDetails": "Допълнителна информация",
+            "title": "Скариди",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Риба и морски дарове",
+            "wonCategoryPrimaryPath": "0/17/1733"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0,
+            "oldPriceSecond": 0,
+            "packaging": {
+              "text": "100 g/опаковка"
+            },
+            "price": 2.55,
+            "priceSecond": 4.99,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060754,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747709,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Скариди",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "ESMARA",
+            "url": "/q/search?q=esmara",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/esmara-rokly/p10060585",
+          "canonicalUrl": "/p/esmara-rokly/p10060585",
+          "category": "Нехранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060585",
+          "flashSales": false,
+          "fullTitle": "ESMARA Рокля",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "515266"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/BfkQeW2ECDtTtN3nm7YUqovR0qmvlNP-E-KSKZv8XcU/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvaW50LzUxRTExMjRCRUZGRkMxNEY2Qzg0QjU5Nj/hGMzg2NTMzREJGNjI0NUVGRUM2NkZEQkE4QUY0NDg3NjA2MjFFQTAucG5n.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060585,
+          "keyfacts": {
+            "analyticsCategory": "Нехранителни",
+            "fullTitle": "ESMARA Рокля",
+            "moreDetails": "Допълнителна информация",
+            "title": "Рокля",
+            "wonCategoryPrimary": "Светове на нуждата/Мода и аксесоари/Женска мода",
+            "wonCategoryPrimaryPath": "0/15/1510"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "discountHasStar": false,
+              "discountText": "Акция",
+              "fromRecommendedPrice": false,
+              "showDiscount": false,
+              "showFrom": false,
+              "showPercentage": false,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0,
+            "oldPriceSecond": 0,
+            "packaging": {
+              "text": "бр."
+            },
+            "price": 9.71,
+            "priceSecond": 18.99,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060585,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747707,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Рокля",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "ORLANDO",
+            "url": "/q/search?q=orlando",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/orlando-pauc-za-kuceta/p10060974",
+          "canonicalUrl": "/p/orlando-pauc-za-kuceta/p10060974",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060974",
+          "flashSales": false,
+          "fullTitle": "ORLANDO Пауч за кучета",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "137350"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/HCPLnFvwasvMG0U6D-M-P4LExS_2Vo_B4aJSQ0tpkDg/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS81OTM5NzMxNDkzOUFGOTAzRkI1MDAzODA/3RUVFOEZBQTk2OUU5MUVFNTQ4Nzg5RUJDREI4NjhEQkQwQzZFQ0MzLnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060974,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "ORLANDO Пауч за кучета",
+            "moreDetails": "Допълнителна информация",
+            "title": "Пауч за кучета",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Стоки за домашни любимци/Храна за кучета",
+            "wonCategoryPrimaryPath": "0/17/1748/174810"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "deletedPrice": 4.34,
+              "deletedPriceSecond": 8.49,
+              "discountHasStar": false,
+              "discountText": "-24%",
+              "fromRecommendedPrice": false,
+              "hideBargainHint": false,
+              "bargainHintEnabled": false,
+              "bargainHintText": "BargainHint_Text",
+              "percentageDiscount": 24,
+              "showDiscount": true,
+              "showFrom": false,
+              "showPercentage": true,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 4.34,
+            "oldPriceSecond": 8.49,
+            "packaging": {
+              "text": "12 x 100 g/опаковка"
+            },
+            "price": 3.29,
+            "priceSecond": 6.43,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060974,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785964487,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 10.08. - 16.08.",
+                  "type": "IN_STORE_FROM_FUTURE_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 10.08. - 16.08.",
+                    "type": "IN_STORE_FROM_FUTURE_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1786309200,
+                "validUntil": 1786913999
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": false,
+          "storeStartDate": 1786309200,
+          "storeEndDate": 1786913999,
+          "title": "Пауч за кучета",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "ORLANDO",
+            "url": "/q/search?q=orlando",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/orlando-dentalni-pr'citi-za-kuceta/p10060976",
+          "canonicalUrl": "/p/orlando-dentalni-pr'citi-za-kuceta/p10060976",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060976",
+          "flashSales": false,
+          "fullTitle": "ORLANDO Дентални пръчици за кучета",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "216941"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/YMQvpIGPiVTCKQ-kDD2li7CqEGPVutQfqJrXkY3CaWk/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS9FMTM0MURDMzlDODRCRDE3NzMxMkI0MDd/ERDA3OEQwNjI3RDU0RTUyNkVDOEVEQ0NBNEI1Q0QxNTdGNEYzMEU2LnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060976,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "ORLANDO Дентални пръчици за кучета",
+            "moreDetails": "Допълнителна информация",
+            "title": "Дентални пръчици за кучета",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Стоки за домашни любимци/Грижа за домашните любимци и лакомства",
+            "wonCategoryPrimaryPath": "0/17/1748/174812"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "deletedPrice": 1.38,
+              "deletedPriceSecond": 2.7,
+              "discountHasStar": false,
+              "discountText": "-35%",
+              "fromRecommendedPrice": false,
+              "hideBargainHint": false,
+              "bargainHintEnabled": false,
+              "bargainHintText": "BargainHint_Text",
+              "percentageDiscount": 35,
+              "showDiscount": true,
+              "showFrom": false,
+              "showPercentage": true,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 1.38,
+            "oldPriceSecond": 2.7,
+            "packaging": {
+              "text": "270 g/опаковка"
+            },
+            "price": 0.89,
+            "priceSecond": 1.74,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060976,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785963814,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 10.08. - 16.08.",
+                  "type": "IN_STORE_FROM_FUTURE_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 27.07. - 02.08.",
+                    "type": "IN_STORE_PAST_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785099600,
+                "validUntil": 1785704399
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": false,
+          "storeStartDate": 1786309200,
+          "storeEndDate": 1786913999,
+          "title": "Дентални пръчици за кучета",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "name": "AMADORI",
+            "url": "/q/search?q=amadori",
+            "showBrand": true
+          },
+          "canonicalPath": "/p/amadori-file-ot-pueski-g'rdi/p10060686",
+          "canonicalUrl": "/p/amadori-file-ot-pueski-g'rdi/p10060686",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060686",
+          "flashSales": false,
+          "fullTitle": "AMADORI Филе от пуешки гърди",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "7210052"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/tsMwKugWS4C-FJsASbusq6abit8CTfI5xE60jPJupg0/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS80ODg1RUFBNjZDNzEyNDQxOUEzMEM4MDY/yRjUzRjg1NUU1NDdBOTI1NUU1NjY0NkM4NjQ4MkIxNEZBQkYyRjc5LnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060686,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "AMADORI Филе от пуешки гърди",
+            "moreDetails": "Допълнителна информация",
+            "title": "Филе от пуешки гърди",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Месо и птиче месо/Птици",
+            "wonCategoryPrimaryPath": "0/17/1738/173810"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "discountHasStar": false,
+              "discountText": "Акция",
+              "fromRecommendedPrice": false,
+              "showDiscount": false,
+              "showFrom": false,
+              "showPercentage": false,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0,
+            "oldPriceSecond": 0,
+            "packaging": {
+              "text": "за kg"
+            },
+            "price": 9.56,
+            "priceSecond": 18.7,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060686,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747708,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Филе от пуешки гърди",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "gridbox": {
+        "data": {
+          "ageRestriction": false,
+          "brand": {
+            "showBrand": false
+          },
+          "canonicalPath": "/p/mini-ponicka/p10060692",
+          "canonicalUrl": "/p/mini-ponicka/p10060692",
+          "category": "Хранителни",
+          "dealOfDay": {
+            "active": false
+          },
+          "designTheme": "default",
+          "displayFreeDelivery": false,
+          "erpNumber": "10060692",
+          "flashSales": false,
+          "fullTitle": "Мини поничка",
+          "havingPrice": true,
+          "havingThreesixty": false,
+          "havingVideos": false,
+          "highlightedSeals": 0,
+          "ians": [
+            "198835"
+          ],
+          "image": "https://imgproxy-retcat.assets.schwarz/5Xuhf6J4HOd-5DX2NaC8vGjH7CeyyWa-gUD1KTdK3Mc/sm:1/exar:1:ce/w:427/h:320/cz/M6Ly9wcm9kLWNhd/GFsb2ctbWVkaWEvYmcvMS84RDExRkM5NUIyOTYwODI2MjI4QUJBQjg/xOEJFNTUwQ0Q0MjcwNzFEMUJCNjVFN0ZDQUJGNDk3QUVDRDlDNjYzLnBuZw.png",
+          "isLidlGiftCard": false,
+          "isUsedProduct": false,
+          "itemId": 10060692,
+          "keyfacts": {
+            "analyticsCategory": "Хранителни",
+            "fullTitle": "Мини поничка",
+            "moreDetails": "Допълнителна информация",
+            "title": "Мини поничка",
+            "wonCategoryPrimary": "Светове на нуждата/Храна и близки до нея храни/Хляб и тестени изделия/Сладки закуски",
+            "wonCategoryPrimaryPath": "0/17/1740/174012"
+          },
+          "lidlPlus": [],
+          "multipack": false,
+          "online": false,
+          "preventSelling": false,
+          "price": {
+            "currencyCode": "EUR",
+            "currencyCodeSecond": "BGN",
+            "currencySymbol": "€",
+            "currencySymbolSecond": "ЛВ.",
+            "discount": {
+              "deletedPrice": 0.35,
+              "deletedPriceSecond": 0.68,
+              "discountHasStar": false,
+              "discountText": "-28%",
+              "fromRecommendedPrice": false,
+              "hideBargainHint": false,
+              "bargainHintEnabled": false,
+              "bargainHintText": "BargainHint_Text",
+              "percentageDiscount": 28,
+              "showDiscount": true,
+              "showFrom": false,
+              "showPercentage": true,
+              "showUpTo": false
+            },
+            "displayedCurrency": "€",
+            "displayedCurrencySecond": "ЛВ.",
+            "hasStar": true,
+            "hasVat": false,
+            "oldPrice": 0.35,
+            "oldPriceSecond": 0.68,
+            "packaging": {
+              "text": "25 g/бр."
+            },
+            "price": 0.25,
+            "priceSecond": 0.49,
+            "priceTheme": "white_red",
+            "specialTaxes": [],
+            "variantsHaveDifferentPrices": false
+          },
+          "productId": 10060692,
+          "productType": "RETAIL",
+          "productOrigin": "progress_event",
+          "quickAddToCart": false,
+          "regionsPrices": {},
+          "ribbons": [],
+          "renderedTs": 1785747708,
+          "seals": [],
+          "stockAvailability": {
+            "availabilityIndicator": 0,
+            "badgeInfo": {
+              "badges": [
+                {
+                  "text": "в магазините от 03.08. - 09.08.",
+                  "type": "IN_STORE_TODAY_DATE_RANGE"
+                }
+              ]
+            },
+            "badgeInfoV2": [
+              {
+                "badges": [
+                  {
+                    "text": "в магазините от 03.08. - 09.08.",
+                    "type": "IN_STORE_TODAY_DATE_RANGE"
+                  }
+                ],
+                "validFrom": 1785704400,
+                "validUntil": 1786309199
+              }
+            ],
+            "onlineAvailable": false,
+            "minOrderableQuantity": 1,
+            "backInStockNotification": false,
+            "backInStockNotificationSoldOut": false
+          },
+          "store": true,
+          "storeStartDate": 1785704400,
+          "storeEndDate": 1786309199,
+          "title": "Мини поничка",
+          "timezoneId": "Europe/Sofia",
+          "zones": {}
+        }
+      }
+    },
+    {
+      "type": "advisor",
+      "advisor": {
+        "id": "nutrition-advisor"
+      }
+    }
+  ]
+}

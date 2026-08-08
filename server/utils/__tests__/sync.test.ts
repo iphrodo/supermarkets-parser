@@ -3,7 +3,9 @@ import type { DealsSnapshot, LeafletPage, Offer } from '../../../shared/types/of
 import { runDailySync } from '../sync'
 
 const LIDL_XLSX_URL = 'https://www.lidl.bg/explore/assets/webPriceData/bg/ExportSecondList.xlsx'
-const LIDL_LEAFLET_URL = 'https://www.lidl.bg/l/bg/broshura/lidl-bg-kw32-2026-08-03/ar/0'
+const LIDL_SITE_URL = 'https://www.lidl.bg/p/milbona-kashkaval/p10060798'
+/** A leaflet source that no longer exists; its leftovers must not survive a run. */
+const REMOVED_LIDL_LEAFLET_URL = 'https://www.lidl.bg/l/bg/broshura/lidl-bg-kw32-2026-08-03/ar/0'
 
 function makeOffer(retailer: 'kaufland' | 'lidl' | 'billa', overrides: Partial<Offer> = {}): Offer {
   const defaultSourceUrl = retailer === 'lidl' ? LIDL_XLSX_URL : 'https://example.com'
@@ -36,12 +38,11 @@ function makeOffer(retailer: 'kaufland' | 'lidl' | 'billa', overrides: Partial<O
   }
 }
 
-function makeLidlLeafletOffer(overrides: Partial<Offer> = {}): Offer {
-  return makeOffer('lidl', { offerKey: 'lidl-leaflet:key', sourceUrl: LIDL_LEAFLET_URL, ...overrides })
+function makeLidlSiteOffer(overrides: Partial<Offer> = {}): Offer {
+  return makeOffer('lidl', { offerKey: 'lidl-site:key', sourceUrl: LIDL_SITE_URL, ...overrides })
 }
 
 const BILLA_PAGE_ID = 'billa:cw31:3'
-const LIDL_LEAFLET_PAGE_ID = 'lidl-leaflet:kw32:1'
 
 function makePage(pageNumber: number, sourceUrl: string): LeafletPage {
   return { imageUrl: `https://example.com/page-${pageNumber}.jpg`, width: 676, height: 947, pageNumber, sourceUrl }
@@ -49,6 +50,15 @@ function makePage(pageNumber: number, sourceUrl: string): LeafletPage {
 
 function withCrop(offer: Offer, pageId: string): Offer {
   return { ...offer, imageCrop: { pageId, box: [100, 100, 300, 300] } }
+}
+
+function makeSources(scrapedAt = '2026-07-31T00:00:00.000Z'): DealsSnapshot['sources'] {
+  return {
+    kaufland: { ok: true, scrapedAt },
+    lidl: { ok: true, scrapedAt },
+    lidlSite: { ok: true, scrapedAt },
+    billa: { ok: true, scrapedAt },
+  }
 }
 
 const silentLog = () => {}
@@ -59,7 +69,7 @@ describe('runDailySync', () => {
     const result = await runDailySync({
       fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
-      fetchLidlLeafletOffers: async () => ({ offers: [makeLidlLeafletOffer()] }),
+      fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer()] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
       readSnapshot: async () => null,
       writeSnapshot,
@@ -69,7 +79,7 @@ describe('runDailySync', () => {
     expect(result.published).toBe(true)
     expect(result.reason).toBe('success')
     expect(result.snapshot!.offers).toHaveLength(4)
-    expect(result.snapshot!.sources.lidlLeaflet.ok).toBe(true)
+    expect(result.snapshot!.sources.lidlSite.ok).toBe(true)
     expect(writeSnapshot).toHaveBeenCalledTimes(1)
   })
 
@@ -79,12 +89,7 @@ describe('runDailySync', () => {
       comparisons: [],
       leafletPages: {},
       generatedAt: '2026-07-31T00:00:00.000Z',
-      sources: {
-        kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidl: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidlLeaflet: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        billa: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-      },
+      sources: makeSources(),
     }
 
     const writeSnapshot = vi.fn()
@@ -93,7 +98,7 @@ describe('runDailySync', () => {
         throw new Error('kaufland fetch failed')
       },
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl', { offerKey: 'fresh-lidl' })] }),
-      fetchLidlLeafletOffers: async () => ({ offers: [makeLidlLeafletOffer({ offerKey: 'fresh-lidl-leaflet' })] }),
+      fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer({ offerKey: 'fresh-lidl-site' })] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa', { offerKey: 'fresh-billa' })] }),
       readSnapshot: async () => previous,
       writeSnapshot,
@@ -105,15 +110,52 @@ describe('runDailySync', () => {
     const offerKeys = result.snapshot!.offers.map((o) => o.offerKey)
     expect(offerKeys).toContain('stale-kaufland')
     expect(offerKeys).toContain('fresh-lidl')
-    expect(offerKeys).toContain('fresh-lidl-leaflet')
+    expect(offerKeys).toContain('fresh-lidl-site')
     expect(offerKeys).toContain('fresh-billa')
     expect(result.snapshot!.sources.kaufland.ok).toBe(false)
     expect(result.snapshot!.sources.kaufland.scrapedAt).toBe('2026-07-31T00:00:00.000Z')
   })
 
-  it('publishes with only Billa fresh when Kaufland, Lidl, and the Lidl leaflet all fail', async () => {
+  it('carries forward the Lidl site source’s own last known-good offers when only it fails', async () => {
     const previous: DealsSnapshot = {
-      offers: [makeOffer('kaufland', { offerKey: 'stale-kaufland' }), makeOffer('lidl', { offerKey: 'stale-lidl' })],
+      offers: [
+        makeLidlSiteOffer({ offerKey: 'stale-lidl-site', scrapedAt: '2026-07-31T00:00:00.000Z' }),
+        makeOffer('lidl', { offerKey: 'stale-lidl-xlsx' }),
+      ],
+      comparisons: [],
+      leafletPages: {},
+      generatedAt: '2026-07-31T00:00:00.000Z',
+      sources: makeSources(),
+    }
+
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
+      fetchLidlOffers: async () => ({ offers: [makeOffer('lidl', { offerKey: 'fresh-lidl-xlsx' })] }),
+      fetchLidlSiteOffers: async () => {
+        throw new Error('lidl site down')
+      },
+      fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      readSnapshot: async () => previous,
+      writeSnapshot: vi.fn(),
+      logError: silentLog,
+    })
+
+    const offerKeys = result.snapshot!.offers.map((o) => o.offerKey)
+    expect(offerKeys).toContain('stale-lidl-site')
+    expect(offerKeys).toContain('fresh-lidl-xlsx')
+    expect(offerKeys).not.toContain('stale-lidl-xlsx')
+    expect(result.snapshot!.sources.lidlSite.ok).toBe(false)
+    expect(result.snapshot!.sources.lidlSite.scrapedAt).toBe('2026-07-31T00:00:00.000Z')
+  })
+
+  it('treats a source the previous snapshot never knew about as having no last known-good data', async () => {
+    // A snapshot written before `lidlLeaflet` was renamed to `lidlSite`: it
+    // carries no status for the source this run knows about.
+    const previous = {
+      offers: [
+        makeOffer('kaufland', { offerKey: 'stale-kaufland' }),
+        makeOffer('lidl', { offerKey: 'stale-lidl-leaflet', sourceUrl: REMOVED_LIDL_LEAFLET_URL }),
+      ],
       comparisons: [],
       leafletPages: {},
       generatedAt: '2026-07-31T00:00:00.000Z',
@@ -123,6 +165,37 @@ describe('runDailySync', () => {
         lidlLeaflet: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
         billa: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
       },
+    } as unknown as DealsSnapshot
+
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => {
+        throw new Error('kaufland down')
+      },
+      fetchLidlOffers: async () => ({ offers: [makeOffer('lidl', { offerKey: 'fresh-lidl' })] }),
+      fetchLidlSiteOffers: async () => {
+        throw new Error('lidl site down')
+      },
+      fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      readSnapshot: async () => previous,
+      writeSnapshot: vi.fn(),
+      logError: silentLog,
+    })
+
+    expect(result.published).toBe(true)
+    expect(result.snapshot!.sources.lidlSite).toEqual({ ok: false, scrapedAt: null })
+    // Carry-forward for the sources the snapshot does know about still works.
+    expect(result.snapshot!.offers.map((o) => o.offerKey)).toContain('stale-kaufland')
+    // The removed leaflet source's offers belong to no current source.
+    expect(result.snapshot!.offers.map((o) => o.offerKey)).not.toContain('stale-lidl-leaflet')
+  })
+
+  it('publishes with only Billa fresh when Kaufland, Lidl, and the Lidl site source all fail', async () => {
+    const previous: DealsSnapshot = {
+      offers: [makeOffer('kaufland', { offerKey: 'stale-kaufland' }), makeOffer('lidl', { offerKey: 'stale-lidl' })],
+      comparisons: [],
+      leafletPages: {},
+      generatedAt: '2026-07-31T00:00:00.000Z',
+      sources: makeSources(),
     }
 
     const result = await runDailySync({
@@ -132,8 +205,8 @@ describe('runDailySync', () => {
       fetchLidlOffers: async () => {
         throw new Error('lidl down')
       },
-      fetchLidlLeafletOffers: async () => {
-        throw new Error('lidl leaflet down')
+      fetchLidlSiteOffers: async () => {
+        throw new Error('lidl site down')
       },
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa', { offerKey: 'fresh-billa' })] }),
       readSnapshot: async () => previous,
@@ -158,8 +231,8 @@ describe('runDailySync', () => {
       fetchLidlOffers: async () => {
         throw new Error('lidl down')
       },
-      fetchLidlLeafletOffers: async () => {
-        throw new Error('lidl leaflet down')
+      fetchLidlSiteOffers: async () => {
+        throw new Error('lidl site down')
       },
       fetchBillaOffers: async () => {
         throw new Error('billa down')
@@ -174,21 +247,16 @@ describe('runDailySync', () => {
     expect(writeSnapshot).not.toHaveBeenCalled()
   })
 
-  it('does not resurrect the still-succeeding Lidl leaflet source’s stale offers when only the XLSX source fails', async () => {
+  it('does not resurrect the still-succeeding Lidl site source’s stale offers when only the XLSX source fails', async () => {
     const previous: DealsSnapshot = {
       offers: [
         makeOffer('lidl', { offerKey: 'stale-lidl-xlsx', sourceUrl: LIDL_XLSX_URL }),
-        makeLidlLeafletOffer({ offerKey: 'stale-lidl-leaflet' }),
+        makeLidlSiteOffer({ offerKey: 'stale-lidl-site' }),
       ],
       comparisons: [],
       leafletPages: {},
       generatedAt: '2026-07-31T00:00:00.000Z',
-      sources: {
-        kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidl: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidlLeaflet: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        billa: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-      },
+      sources: makeSources(),
     }
 
     const writeSnapshot = vi.fn()
@@ -197,7 +265,7 @@ describe('runDailySync', () => {
       fetchLidlOffers: async () => {
         throw new Error('lidl xlsx fetch failed')
       },
-      fetchLidlLeafletOffers: async () => ({ offers: [makeLidlLeafletOffer({ offerKey: 'fresh-lidl-leaflet' })] }),
+      fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer({ offerKey: 'fresh-lidl-site' })] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
       readSnapshot: async () => previous,
       writeSnapshot,
@@ -208,8 +276,8 @@ describe('runDailySync', () => {
     expect(result.reason).toBe('partial')
     const offerKeys = result.snapshot!.offers.map((o) => o.offerKey)
     expect(offerKeys).toContain('stale-lidl-xlsx')
-    expect(offerKeys).toContain('fresh-lidl-leaflet')
-    expect(offerKeys).not.toContain('stale-lidl-leaflet')
+    expect(offerKeys).toContain('fresh-lidl-site')
+    expect(offerKeys).not.toContain('stale-lidl-site')
   })
 
   it('publishes with the previous comparisons when comparison enrichment fails', async () => {
@@ -221,19 +289,14 @@ describe('runDailySync', () => {
       comparisons: previousComparisons,
       leafletPages: {},
       generatedAt: '2026-07-31T00:00:00.000Z',
-      sources: {
-        kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidl: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidlLeaflet: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        billa: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-      },
+      sources: makeSources(),
     }
 
     const writeSnapshot = vi.fn()
     const result = await runDailySync({
       fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
-      fetchLidlLeafletOffers: async () => ({ offers: [makeLidlLeafletOffer()] }),
+      fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer()] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
       readSnapshot: async () => previous,
       writeSnapshot,
@@ -247,14 +310,11 @@ describe('runDailySync', () => {
     expect(result.snapshot!.comparisons).toEqual(previousComparisons)
   })
 
-  it('merges both leaflet sources’ page registries into one snapshot', async () => {
+  it('publishes Billa’s page registry alongside the page-free sources’ offers', async () => {
     const result = await runDailySync({
       fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
-      fetchLidlLeafletOffers: async () => ({
-        offers: [withCrop(makeLidlLeafletOffer(), LIDL_LEAFLET_PAGE_ID)],
-        leafletPages: { [LIDL_LEAFLET_PAGE_ID]: makePage(1, LIDL_LEAFLET_URL) },
-      }),
+      fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer()] }),
       fetchBillaOffers: async () => ({
         offers: [withCrop(makeOffer('billa'), BILLA_PAGE_ID)],
         leafletPages: { [BILLA_PAGE_ID]: makePage(3, 'https://view.publitas.com/billa/cw31/') },
@@ -264,36 +324,31 @@ describe('runDailySync', () => {
       logError: silentLog,
     })
 
-    expect(Object.keys(result.snapshot!.leafletPages).sort()).toEqual([BILLA_PAGE_ID, LIDL_LEAFLET_PAGE_ID])
+    expect(Object.keys(result.snapshot!.leafletPages)).toEqual([BILLA_PAGE_ID])
   })
 
-  it('carries forward only the failed leaflet source’s pages, not the succeeding one’s superseded pages', async () => {
+  it('drops a removed source’s leftover offers and prunes the pages only they referenced', async () => {
     const previous: DealsSnapshot = {
       offers: [
         withCrop(makeOffer('billa', { offerKey: 'stale-billa' }), BILLA_PAGE_ID),
-        withCrop(makeLidlLeafletOffer({ offerKey: 'stale-lidl-leaflet' }), 'lidl-leaflet:kw31:1'),
+        withCrop(
+          makeOffer('lidl', { offerKey: 'stale-lidl-leaflet', sourceUrl: REMOVED_LIDL_LEAFLET_URL }),
+          'lidl-leaflet:kw31:1',
+        ),
       ],
       comparisons: [],
       leafletPages: {
         [BILLA_PAGE_ID]: makePage(3, 'https://view.publitas.com/billa/cw31/'),
-        'lidl-leaflet:kw31:1': makePage(1, LIDL_LEAFLET_URL),
+        'lidl-leaflet:kw31:1': makePage(1, REMOVED_LIDL_LEAFLET_URL),
       },
       generatedAt: '2026-07-31T00:00:00.000Z',
-      sources: {
-        kaufland: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidl: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        lidlLeaflet: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-        billa: { ok: true, scrapedAt: '2026-07-31T00:00:00.000Z' },
-      },
+      sources: makeSources(),
     }
 
     const result = await runDailySync({
       fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
-      fetchLidlLeafletOffers: async () => ({
-        offers: [withCrop(makeLidlLeafletOffer({ offerKey: 'fresh-lidl-leaflet' }), LIDL_LEAFLET_PAGE_ID)],
-        leafletPages: { [LIDL_LEAFLET_PAGE_ID]: makePage(1, LIDL_LEAFLET_URL) },
-      }),
+      fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer()] }),
       fetchBillaOffers: async () => {
         throw new Error('billa down')
       },
@@ -302,16 +357,17 @@ describe('runDailySync', () => {
       logError: silentLog,
     })
 
-    const pageIds = Object.keys(result.snapshot!.leafletPages).sort()
-    expect(pageIds).toEqual([BILLA_PAGE_ID, LIDL_LEAFLET_PAGE_ID])
-    expect(pageIds).not.toContain('lidl-leaflet:kw31:1')
+    const offerKeys = result.snapshot!.offers.map((o) => o.offerKey)
+    expect(offerKeys).toContain('stale-billa')
+    expect(offerKeys).not.toContain('stale-lidl-leaflet')
+    expect(Object.keys(result.snapshot!.leafletPages)).toEqual([BILLA_PAGE_ID])
   })
 
   it('prunes pages no surviving offer’s crop references', async () => {
     const result = await runDailySync({
       fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
-      fetchLidlLeafletOffers: async () => ({ offers: [] }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
       fetchBillaOffers: async () => ({
         offers: [withCrop(makeOffer('billa'), BILLA_PAGE_ID)],
         leafletPages: {
@@ -336,7 +392,7 @@ describe('runDailySync', () => {
       fetchLidlOffers: async () => ({
         offers: [makeOffer('lidl', { offerKey: 'l', productKey: 'l', priceEurCents: 400, unitText: '500 г' })],
       }),
-      fetchLidlLeafletOffers: async () => ({ offers: [] }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
       fetchBillaOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot,
