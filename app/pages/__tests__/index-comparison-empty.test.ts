@@ -19,7 +19,7 @@ describe('comparison landing page: empty state', () => {
 
     const wrapper = await mountSuspended(IndexPage)
 
-    expect(wrapper.text()).toContain('No product is currently on offer in two or more stores.')
+    expect(wrapper.text()).toContain('В момента няма продукт с оферта в два или повече магазина.')
     expect(wrapper.findAll('article')).toHaveLength(0)
   })
 })

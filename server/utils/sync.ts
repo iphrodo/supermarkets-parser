@@ -4,6 +4,8 @@ import { mergeCatalog } from './catalog'
 import { buildComparisons } from './comparison'
 import type { ProductTypeAssignments, ProductTypeVocabulary } from './kv'
 import { classifyOffers as classifyOffersImpl, defaultClassifyOffersDeps } from './product-type'
+import { backfillDepartments as backfillDepartmentsImpl, defaultBackfillDepartmentsDeps } from './product-type-department'
+import { defaultMergeDuplicateTypesDeps, mergeAndPersistDuplicateTypes } from './product-type-merge'
 import { BILLA_PAGE_ID_PREFIX } from './scrapers/billa'
 import { isLidlXlsxOffer } from './scrapers/lidl'
 import { isLidlSiteOffer } from './scrapers/lidl-site'
@@ -49,6 +51,13 @@ export interface RunSyncDeps {
   writeSnapshot: (snapshot: DealsSnapshot) => Promise<void>
   /** Injectable so tests never touch the network; defaults to the real model-backed classifier. */
   classifyOffers?: (offers: Offer[]) => Promise<ClassifiedTypes>
+  /** Same, for the vocabulary-level department backfill that runs between classification and comparison building. */
+  backfillDepartments?: (vocabulary: ProductTypeVocabulary) => Promise<ProductTypeVocabulary>
+  /** Same, for the duplicate-type merge that runs just before the backfill. */
+  mergeDuplicateTypes?: (
+    vocabulary: ProductTypeVocabulary,
+    assignments: ProductTypeAssignments,
+  ) => Promise<ClassifiedTypes>
   now?: () => Date
   logError?: (message: string, error: unknown) => void
 }
@@ -156,11 +165,24 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
   const leafletPages = pruneUnreferencedPages(Object.assign({}, ...pagesBySource), merged.offers)
 
   const classify = deps.classifyOffers ?? ((offers) => classifyOffersImpl(offers, defaultClassifyOffersDeps()))
+  const backfill =
+    deps.backfillDepartments ?? ((vocabulary) => backfillDepartmentsImpl(vocabulary, defaultBackfillDepartmentsDeps()))
+  const dedupe =
+    deps.mergeDuplicateTypes ??
+    ((vocabulary, assignments) =>
+      mergeAndPersistDuplicateTypes(vocabulary, assignments, defaultMergeDuplicateTypesDeps()))
 
   let comparisons: ComparisonGroup[]
   try {
-    const { vocabulary, assignments } = await classify(merged.offers)
-    comparisons = buildComparisons(merged.offers, vocabulary, assignments)
+    const classified = await classify(merged.offers)
+    // Inside the same guard as classification: a failure here must degrade to
+    // the previously published comparisons, never block publication.
+    //
+    // Deduplicating first means the backfill never spends a model call on a
+    // type that is about to be merged away.
+    const deduped = await dedupe(classified.vocabulary, classified.assignments)
+    const withDepartments = await backfill(deduped.vocabulary)
+    comparisons = buildComparisons(merged.offers, withDepartments, deduped.assignments)
   } catch (error) {
     log('Comparison enrichment failed; publishing with the previous snapshot’s comparisons', error)
     comparisons = previous?.comparisons ?? []

@@ -22,13 +22,13 @@ function update(partial: Partial<DealsFilterValue>) {
 <template>
   <div class="flex flex-wrap items-end gap-4 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
     <label class="flex flex-col gap-1 text-sm">
-      <span class="text-gray-600 dark:text-gray-300">Retailer</span>
+      <span class="text-gray-600 dark:text-gray-300">Магазин</span>
       <select
         class="rounded border border-gray-300 px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
         :value="modelValue.retailer"
         @change="update({ retailer: ($event.target as HTMLSelectElement).value as DealsFilterValue['retailer'] })"
       >
-        <option value="all">All retailers</option>
+        <option value="all">Всички магазини</option>
         <option value="kaufland">Kaufland</option>
         <option value="lidl">Lidl</option>
         <option value="billa">Billa</option>
@@ -36,19 +36,19 @@ function update(partial: Partial<DealsFilterValue>) {
     </label>
 
     <label class="flex flex-col gap-1 text-sm">
-      <span class="text-gray-600 dark:text-gray-300">Category</span>
+      <span class="text-gray-600 dark:text-gray-300">Категория</span>
       <select
         class="rounded border border-gray-300 px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
         :value="modelValue.category"
         @change="update({ category: ($event.target as HTMLSelectElement).value })"
       >
-        <option value="all">All categories</option>
+        <option value="all">Всички категории</option>
         <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
       </select>
     </label>
 
     <label class="flex flex-col gap-1 text-sm">
-      <span class="text-gray-600 dark:text-gray-300">Max price (€)</span>
+      <span class="text-gray-600 dark:text-gray-300">Макс. цена (€)</span>
       <input
         type="number"
         min="0"

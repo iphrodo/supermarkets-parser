@@ -1,6 +1,7 @@
 import { Redis } from '@upstash/redis'
 import type { DealsSnapshot } from '../../shared/types/offer'
 import type { UnitBase } from '../../shared/types/comparison'
+import type { DepartmentId } from '../../shared/types/department'
 
 const SNAPSHOT_KEY = 'deals:snapshot'
 const BILLA_PUBLICATION_SLUG_KEY = 'billa:last-publication-slug'
@@ -12,6 +13,14 @@ export interface ProductType {
   labelBg: string
   labelEn: string
   unitBase: UnitBase
+  /**
+   * Absent on entries persisted before departments existed. Deliberately *not*
+   * normalized to the catch-all when read: `backfillDepartments` finds exactly
+   * these entries by the key being missing, and a normalizing reader would make
+   * "not yet backfilled" indistinguishable from "genuinely other". Consumers
+   * coerce with `toDepartmentId` at the point of use instead.
+   */
+  department?: DepartmentId
 }
 
 export type ProductTypeVocabulary = ProductType[]
@@ -23,6 +32,20 @@ let client: Redis | null = null
 
 function getRedisClient(): Redis {
   if (client) return client
+
+  /**
+   * Every caller in this codebase takes its KV access as an injected
+   * dependency, so reaching the real client from a test means an injection was
+   * forgotten. That is not a harmless mistake: a test whose stub returns a
+   * one-entry vocabulary will happily write it over the production one. This
+   * fails loudly instead — with a populated `.env`, the silent alternative has
+   * already cost a real vocabulary once.
+   */
+  if (process.env.VITEST) {
+    throw new Error(
+      'Refusing to open a real Redis connection under Vitest — inject this dependency in the test instead',
+    )
+  }
 
   const url = process.env.UPSTASH_REDIS_REST_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN

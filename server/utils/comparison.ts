@@ -1,4 +1,5 @@
 import type { ComparisonEntry, ComparisonGroup } from '../../shared/types/comparison'
+import { toDepartmentId } from '../../shared/types/department'
 import type { Offer, Retailer } from '../../shared/types/offer'
 import type { ProductTypeAssignments, ProductTypeVocabulary } from './kv'
 import { parseQuantity, unitPriceEurCents } from './quantity'
@@ -98,6 +99,7 @@ export function buildComparisons(
       groupKey: typeId,
       labelBg: type.labelBg,
       unitBase: type.unitBase,
+      department: toDepartmentId(type.department),
       entries,
       savingsPercentage,
       warnings,

@@ -1,7 +1,9 @@
 import { vi } from 'vitest'
+import { computed, type ComputedRef } from 'vue'
 
 import type { ComparisonEntry, ComparisonGroup, UnitBase } from '../../../shared/types/comparison'
 import type { DealsSnapshot, Offer, Retailer } from '../../../shared/types/offer'
+import { OFFERS_BY_KEY, type OffersByKey } from '../../composables/useOffersByKey'
 
 export const BATCH_SIZE = 24
 
@@ -60,11 +62,25 @@ export function makeComparisonGroup(overrides: Partial<ComparisonGroup> = {}): C
     groupKey: 'group-0',
     labelBg: 'Пилешко филе',
     unitBase: 'kg' as UnitBase,
+    department: 'meat',
     entries,
     savingsPercentage: 0.2,
     warnings: [],
     ...overrides,
   }
+}
+
+export function makeOffersByKey(offers: Offer[]): ComputedRef<OffersByKey> {
+  return computed(() => new Map(offers.map((offer) => [offer.offerKey, offer])))
+}
+
+/**
+ * Spread into `mountSuspended`'s `global` for any component that injects the
+ * offer lookup — the page provides it in the real tree, so a component mounted
+ * on its own has to be given one.
+ */
+export function withOffers(offers: Offer[]): { provide: Record<symbol, unknown> } {
+  return { provide: { [OFFERS_BY_KEY as symbol]: makeOffersByKey(offers) } }
 }
 
 export class MockIntersectionObserver implements IntersectionObserver {

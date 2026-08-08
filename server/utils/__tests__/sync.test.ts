@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { DealsSnapshot, LeafletPage, Offer } from '../../../shared/types/offer'
+import type { ProductTypeAssignments, ProductTypeVocabulary } from '../kv'
+import { mergeDuplicateTypes } from '../product-type-merge'
 import { runDailySync } from '../sync'
 
 const LIDL_XLSX_URL = 'https://www.lidl.bg/explore/assets/webPriceData/bg/ExportSecondList.xlsx'
@@ -63,6 +65,19 @@ function makeSources(scrapedAt = '2026-07-31T00:00:00.000Z'): DealsSnapshot['sou
 
 const silentLog = () => {}
 
+/**
+ * These tests exercise orchestration, not the backfill, and the real one calls
+ * the model. Injected everywhere so no `runDailySync` test can reach the
+ * network through it — the vocabulary passes straight through.
+ */
+const passthroughBackfill = async (vocabulary: ProductTypeVocabulary) => vocabulary
+
+/** Same, for the duplicate-type merge: the real one writes to KV. */
+const passthroughMerge = async (vocabulary: ProductTypeVocabulary, assignments: ProductTypeAssignments) => ({
+  vocabulary,
+  assignments,
+})
+
 describe('runDailySync', () => {
   it('publishes a fresh snapshot when all four sources succeed', async () => {
     const writeSnapshot = vi.fn()
@@ -73,6 +88,8 @@ describe('runDailySync', () => {
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
       readSnapshot: async () => null,
       writeSnapshot,
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -102,6 +119,8 @@ describe('runDailySync', () => {
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa', { offerKey: 'fresh-billa' })] }),
       readSnapshot: async () => previous,
       writeSnapshot,
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -137,6 +156,8 @@ describe('runDailySync', () => {
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -178,6 +199,8 @@ describe('runDailySync', () => {
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -211,6 +234,8 @@ describe('runDailySync', () => {
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa', { offerKey: 'fresh-billa' })] }),
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -239,6 +264,8 @@ describe('runDailySync', () => {
       },
       readSnapshot,
       writeSnapshot,
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -269,6 +296,8 @@ describe('runDailySync', () => {
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
       readSnapshot: async () => previous,
       writeSnapshot,
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -282,7 +311,15 @@ describe('runDailySync', () => {
 
   it('publishes with the previous comparisons when comparison enrichment fails', async () => {
     const previousComparisons: DealsSnapshot['comparisons'] = [
-      { groupKey: 'chicken-breast', labelBg: 'Пилешко филе', unitBase: 'kg', entries: [], savingsPercentage: 0.2, warnings: [] },
+      {
+        groupKey: 'chicken-breast',
+        labelBg: 'Пилешко филе',
+        unitBase: 'kg',
+        department: 'meat',
+        entries: [],
+        savingsPercentage: 0.2,
+        warnings: [],
+      },
     ]
     const previous: DealsSnapshot = {
       offers: [],
@@ -303,6 +340,8 @@ describe('runDailySync', () => {
       classifyOffers: async () => {
         throw new Error('classification service unavailable')
       },
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -321,6 +360,8 @@ describe('runDailySync', () => {
       }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -354,6 +395,8 @@ describe('runDailySync', () => {
       },
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -377,6 +420,8 @@ describe('runDailySync', () => {
       }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
@@ -400,10 +445,115 @@ describe('runDailySync', () => {
         vocabulary: [{ id: 'chicken-breast', labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg' }],
         assignments: { k: 'chicken-breast', l: 'chicken-breast' },
       }),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
       logError: silentLog,
     })
 
     expect(result.snapshot!.comparisons).toHaveLength(1)
     expect(result.snapshot!.comparisons[0]!.groupKey).toBe('chicken-breast')
+  })
+
+  it('builds comparisons from the backfilled vocabulary, so a department reaches the snapshot on the run it is assigned', async () => {
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({
+        offers: [makeOffer('kaufland', { offerKey: 'k', productKey: 'k', priceEurCents: 500, unitText: '500 г' })],
+      }),
+      fetchLidlOffers: async () => ({
+        offers: [makeOffer('lidl', { offerKey: 'l', productKey: 'l', priceEurCents: 400, unitText: '500 г' })],
+      }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
+      fetchBillaOffers: async () => ({ offers: [] }),
+      readSnapshot: async () => null,
+      writeSnapshot: vi.fn(),
+      classifyOffers: async () => ({
+        // A vocabulary entry that predates departments.
+        vocabulary: [{ id: 'chicken-breast', labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg' }],
+        assignments: { k: 'chicken-breast', l: 'chicken-breast' },
+      }),
+      backfillDepartments: async (vocabulary) => vocabulary.map((type) => ({ ...type, department: 'meat' as const })),
+      logError: silentLog,
+    })
+
+    expect(result.snapshot!.comparisons[0]!.department).toBe('meat')
+  })
+
+  it('builds comparisons from the merged vocabulary and assignments', async () => {
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({
+        offers: [makeOffer('kaufland', { offerKey: 'k', productKey: 'k', priceEurCents: 500, unitText: '500 г' })],
+      }),
+      fetchLidlOffers: async () => ({
+        offers: [makeOffer('lidl', { offerKey: 'l', productKey: 'l', priceEurCents: 400, unitText: '500 г' })],
+      }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
+      fetchBillaOffers: async () => ({ offers: [] }),
+      readSnapshot: async () => null,
+      writeSnapshot: vi.fn(),
+      // One product kind split across two duplicate types, one retailer each —
+      // neither type alone clears the two-retailer bar.
+      classifyOffers: async () => ({
+        vocabulary: [
+          { id: 'кисело-мляко', labelBg: 'кисело мляко', labelEn: 'Yogurt', unitBase: 'kg', department: 'dairy-eggs' },
+          { id: 'кисело-мляко-2', labelBg: 'кисело мляко', labelEn: 'Yogurt', unitBase: 'kg', department: 'dairy-eggs' },
+        ],
+        assignments: { k: 'кисело-мляко', l: 'кисело-мляко-2' },
+      }),
+      mergeDuplicateTypes: async (vocabulary, assignments) =>
+        mergeDuplicateTypes(vocabulary, assignments),
+      backfillDepartments: passthroughBackfill,
+      logError: silentLog,
+    })
+
+    // Merging them makes one group covering both retailers.
+    expect(result.snapshot!.comparisons).toHaveLength(1)
+    expect(result.snapshot!.comparisons[0]!.entries.map((e) => e.retailer).sort()).toEqual(['kaufland', 'lidl'])
+  })
+
+  it('still publishes when the duplicate-type merge fails', async () => {
+    const logError = vi.fn()
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
+      fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
+      fetchBillaOffers: async () => ({ offers: [] }),
+      readSnapshot: async () => null,
+      writeSnapshot: vi.fn(),
+      mergeDuplicateTypes: async () => {
+        throw new Error('KV unavailable')
+      },
+      backfillDepartments: passthroughBackfill,
+      logError,
+    })
+
+    expect(result.published).toBe(true)
+    expect(logError).toHaveBeenCalledOnce()
+  })
+
+  it('still publishes when the department backfill fails', async () => {
+    const logError = vi.fn()
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({
+        offers: [makeOffer('kaufland', { offerKey: 'k', productKey: 'k', priceEurCents: 500, unitText: '500 г' })],
+      }),
+      fetchLidlOffers: async () => ({
+        offers: [makeOffer('lidl', { offerKey: 'l', productKey: 'l', priceEurCents: 400, unitText: '500 г' })],
+      }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
+      fetchBillaOffers: async () => ({ offers: [] }),
+      readSnapshot: async () => null,
+      writeSnapshot: vi.fn(),
+      classifyOffers: async () => ({
+        vocabulary: [{ id: 'chicken-breast', labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg' }],
+        assignments: { k: 'chicken-breast', l: 'chicken-breast' },
+      }),
+      backfillDepartments: async () => {
+        throw new Error('model unavailable')
+      },
+      logError,
+    })
+
+    expect(result.published).toBe(true)
+    expect(logError).toHaveBeenCalledOnce()
   })
 })

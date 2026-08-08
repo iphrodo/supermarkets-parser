@@ -75,7 +75,7 @@ describe('classifyOffers', () => {
         items.map((item) => ({
           index: item.index,
           typeId: null,
-          newType: { labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg' },
+          newType: { labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg', department: 'meat' },
           confident: true,
         })),
     )
@@ -85,7 +85,53 @@ describe('classifyOffers', () => {
 
     expect(result.vocabulary).toHaveLength(1)
     expect(result.vocabulary[0]!.labelBg).toBe('Пилешко филе')
+    expect(result.vocabulary[0]!.department).toBe('meat')
     expect(result.assignments['product-1']).toBe(result.vocabulary[0]!.id)
+  })
+
+  it('coerces a department outside the taxonomy to the catch-all rather than losing the type', async () => {
+    const classifyBatch = vi.fn(
+      async (items: ClassificationItem[]): Promise<ClassificationResult[]> =>
+        items.map((item) => ({
+          index: item.index,
+          typeId: null,
+          // The model inventing an aisle must cost the aisle, never the comparison group.
+          newType: {
+            labelBg: 'Пилешко филе',
+            labelEn: 'Chicken breast',
+            unitBase: 'kg',
+            department: 'месо' as never,
+          },
+          confident: true,
+        })),
+    )
+    const deps = makeDeps({ classifyBatch })
+
+    const result = await classifyOffers([makeOffer()], deps)
+
+    expect(result.vocabulary).toHaveLength(1)
+    expect(result.vocabulary[0]!.department).toBe('other')
+    expect(result.assignments['product-1']).toBe(result.vocabulary[0]!.id)
+  })
+
+  it('reuses an existing type without requiring a department decision for the offer', async () => {
+    const classifyBatch = vi.fn(async (items: ClassificationItem[]): Promise<ClassificationResult[]> =>
+      items.map((item) => ({ index: item.index, typeId: 'chicken-breast', newType: null, confident: true })),
+    )
+    const deps = makeDeps(
+      { classifyBatch },
+      {
+        vocabulary: [
+          { id: 'chicken-breast', labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg', department: 'meat' },
+        ],
+      },
+    )
+
+    const result = await classifyOffers([makeOffer()], deps)
+
+    expect(result.assignments['product-1']).toBe('chicken-breast')
+    expect(result.vocabulary).toHaveLength(1)
+    expect(result.vocabulary[0]!.department).toBe('meat')
   })
 
   it('drops an unconfident assignment so the offer never enters a comparison', async () => {
@@ -97,6 +143,87 @@ describe('classifyOffers', () => {
     const result = await classifyOffers([makeOffer()], deps)
 
     expect(result.assignments['product-1']).toBeUndefined()
+  })
+
+  it('reuses an existing type when the model proposes one that already exists', async () => {
+    // The model proposing a type the vocabulary already holds is exactly what
+    // used to mint `кисело-мляко-2`; the system now catches it instead.
+    const classifyBatch = vi.fn(
+      async (items: ClassificationItem[]): Promise<ClassificationResult[]> =>
+        items.map((item) => ({
+          index: item.index,
+          typeId: null,
+          newType: { labelBg: 'Кисело мляко', labelEn: 'Yogurt', unitBase: 'kg', department: 'pantry' },
+          confident: true,
+        })),
+    )
+    const deps = makeDeps(
+      { classifyBatch },
+      {
+        vocabulary: [
+          { id: 'кисело-мляко', labelBg: 'кисело мляко', labelEn: 'Yogurt', unitBase: 'kg', department: 'dairy-eggs' },
+        ],
+      },
+    )
+
+    const result = await classifyOffers([makeOffer()], deps)
+
+    expect(result.vocabulary).toHaveLength(1)
+    expect(result.assignments['product-1']).toBe('кисело-мляко')
+    // The existing entry's department wins; the proposal's is discarded with it.
+    expect(result.vocabulary[0]!.department).toBe('dairy-eggs')
+  })
+
+  it('creates a separate type when the label matches but the base unit does not', async () => {
+    const classifyBatch = vi.fn(
+      async (items: ClassificationItem[]): Promise<ClassificationResult[]> =>
+        items.map((item) => ({
+          index: item.index,
+          typeId: null,
+          newType: { labelBg: 'сладолед', labelEn: 'Ice cream', unitBase: 'l', department: 'frozen' },
+          confident: true,
+        })),
+    )
+    const deps = makeDeps(
+      { classifyBatch },
+      {
+        vocabulary: [
+          { id: 'сладолед', labelBg: 'сладолед', labelEn: 'Ice cream', unitBase: 'kg', department: 'frozen' },
+        ],
+      },
+    )
+
+    const result = await classifyOffers([makeOffer()], deps)
+
+    expect(result.vocabulary).toHaveLength(2)
+    expect(result.assignments['product-1']).toBe('сладолед-2')
+  })
+
+  it('still mints a suffixed id for two genuinely different labels that slugify the same', async () => {
+    const classifyBatch = vi.fn(
+      async (items: ClassificationItem[]): Promise<ClassificationResult[]> =>
+        items.map((item) => ({
+          index: item.index,
+          typeId: null,
+          newType: { labelBg: 'кисело-мляко', labelEn: 'Yogurt', unitBase: 'kg', department: 'dairy-eggs' },
+          confident: true,
+        })),
+    )
+    const deps = makeDeps(
+      { classifyBatch },
+      {
+        vocabulary: [
+          { id: 'кисело-мляко', labelBg: 'кисело мляко', labelEn: 'Yogurt', unitBase: 'kg', department: 'dairy-eggs' },
+        ],
+      },
+    )
+
+    const result = await classifyOffers([makeOffer()], deps)
+
+    // Different labels ("кисело мляко" vs "кисело-мляко") sharing one slug — the
+    // case the suffix was written for, and now the only way to reach it.
+    expect(result.vocabulary).toHaveLength(2)
+    expect(result.assignments['product-1']).toBe('кисело-мляко-2')
   })
 
   it('splits large inputs into multiple batches', async () => {

@@ -153,4 +153,32 @@ describe('buildComparisons', () => {
 
     expect(buildComparisons(offers, vocabulary, assignments)).toEqual([])
   })
+
+  it('carries the canonical type’s department onto the published group', () => {
+    const offers = [
+      makeOffer({ offerKey: 'a', productKey: 'a', retailer: 'kaufland' }),
+      makeOffer({ offerKey: 'b', productKey: 'b', retailer: 'lidl' }),
+    ]
+    const vocabulary: ProductTypeVocabulary = [{ ...CHICKEN_TYPE, department: 'meat' }]
+    const assignments: ProductTypeAssignments = { a: 'chicken-breast', b: 'chicken-breast' }
+
+    const groups = buildComparisons(offers, vocabulary, assignments)
+
+    expect(groups[0]!.department).toBe('meat')
+  })
+
+  it('publishes a type that predates departments under the catch-all', () => {
+    const offers = [
+      makeOffer({ offerKey: 'a', productKey: 'a', retailer: 'kaufland' }),
+      makeOffer({ offerKey: 'b', productKey: 'b', retailer: 'lidl' }),
+    ]
+    // CHICKEN_TYPE carries no department, as every vocabulary entry written
+    // before this change does.
+    const vocabulary: ProductTypeVocabulary = [CHICKEN_TYPE]
+    const assignments: ProductTypeAssignments = { a: 'chicken-breast', b: 'chicken-breast' }
+
+    const groups = buildComparisons(offers, vocabulary, assignments)
+
+    expect(groups[0]!.department).toBe('other')
+  })
 })
