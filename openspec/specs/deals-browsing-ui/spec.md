@@ -7,7 +7,7 @@ Presents the cached deal catalog to the end user as a single filterable page, al
 ## Requirements
 
 ### Requirement: Price comparison is the landing view
-The landing page SHALL present cross-retailer price comparisons rather than the flat offer list, showing for each canonical product type the participating retailers' per-unit prices with the cheapest one visually distinguished. Each comparison SHALL lead with a product image and a price, so that what is being compared and what it costs are both apparent without reading secondary text.
+The landing page SHALL present cross-retailer price comparisons rather than the flat offer list, showing for each canonical product type the participating retailers' per-unit prices with the cheapest one visually distinguished. Each comparison SHALL lead with a product image and a price, so that what is being compared and what it costs are both apparent without reading secondary text. The image SHALL depict the offer the comparison's headline prices whenever that offer has usable imagery of any kind, since the image and the headline price are read as one statement about one product.
 
 #### Scenario: Landing page load
 - **WHEN** a user opens the site root
@@ -22,8 +22,12 @@ The landing page SHALL present cross-retailer price comparisons rather than the 
 - **THEN** the underlying offer's product name, pack size, and retailer SHALL be visible, so the user can see what is being compared
 
 #### Scenario: Comparison carries a product image
-- **WHEN** a comparison group is displayed and at least one of its offers has usable imagery
-- **THEN** a product image SHALL be shown for the group, preferring a direct product photograph over a leaflet crop and, among equivalent candidates, the cheapest entry's offer
+- **WHEN** a comparison group is displayed and its cheapest entry has usable imagery
+- **THEN** the group's image SHALL be that entry's own imagery, whether it is a direct product photograph or a leaflet crop, so the pictured product is the one the headline price refers to
+
+#### Scenario: The cheapest entry has no usable imagery
+- **WHEN** a comparison group is displayed whose cheapest entry has neither a direct product photograph nor a resolvable leaflet crop, while another entry does
+- **THEN** the group's image SHALL be taken from another entry, preferring a direct product photograph over a leaflet crop
 
 #### Scenario: No offer in the group has an image
 - **WHEN** a comparison group is displayed and none of its offers has usable imagery
