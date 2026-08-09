@@ -78,11 +78,27 @@ describe('resolveHeroOffer', () => {
     expect(resolveHeroOffer(makeGroup(), lookup(cheap, dear), {})?.offerKey).toBe('dear')
   })
 
-  it('prefers a photograph over a crop even when the crop is the cheapest entry’s', () => {
+  it('prefers the cheapest entry’s crop over another entry’s photograph', () => {
     const cheap = makeOffer('cheap', { imageCrop: { pageId: PAGE_ID, box: [100, 100, 300, 300] } })
     const dear = makeOffer('dear', { imageUrl: 'https://example.com/dear.jpg' })
 
-    expect(resolveHeroOffer(makeGroup(), lookup(cheap, dear), PAGES)?.offerKey).toBe('dear')
+    expect(resolveHeroOffer(makeGroup(), lookup(cheap, dear), PAGES)?.offerKey).toBe('cheap')
+  })
+
+  it('falls back to another entry’s photograph over another entry’s crop when the cheapest has no imagery', () => {
+    const group: ComparisonGroup = {
+      ...makeGroup(),
+      entries: [
+        { offerKey: 'cheap', retailer: 'lidl', priceEurCents: 400, unitPriceEurCents: 800, isCheapest: true },
+        { offerKey: 'crop', retailer: 'billa', priceEurCents: 450, unitPriceEurCents: 900, isCheapest: false },
+        { offerKey: 'photo', retailer: 'kaufland', priceEurCents: 500, unitPriceEurCents: 1000, isCheapest: false },
+      ],
+    }
+    const cheap = makeOffer('cheap')
+    const crop = makeOffer('crop', { imageCrop: { pageId: PAGE_ID, box: [100, 100, 300, 300] } })
+    const photo = makeOffer('photo', { imageUrl: 'https://example.com/photo.jpg' })
+
+    expect(resolveHeroOffer(group, lookup(cheap, crop, photo), PAGES)?.offerKey).toBe('photo')
   })
 
   it('takes the cheapest entry’s crop when no entry has a photograph', () => {

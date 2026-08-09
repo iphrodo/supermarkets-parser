@@ -9,14 +9,19 @@ import type { LeafletPage, Offer } from '../../shared/types/offer'
  * flatness the redesign removes. Per-retailer imagery lives in the details
  * view, where the user has already asked to compare specifics.
  *
- * The order prefers a clean product photograph over a leaflet crop, and the
- * cheapest entry over the others:
+ * The order prefers the cheapest entry's own imagery over attribution to any
+ * other entry, since the image and the headline price are read as one
+ * statement about one product:
  *
  * 1. cheapest entry with a direct image URL
- * 2. any entry with one
- * 3. cheapest entry with a resolvable crop
+ * 2. cheapest entry with a resolvable crop
+ * 3. any entry with a direct image URL
  * 4. any entry with a resolvable crop
  * 5. none — the caller shows a placeholder tile
+ *
+ * Cross-entry fallback (steps 3-4) only applies when the cheapest entry has
+ * no usable imagery of its own; there, a clean photograph is still preferred
+ * over a leaflet crop.
  *
  * A crop counts only when the page it points at is present in the same
  * snapshot; an unresolvable crop is no imagery at all, not a broken image.
@@ -39,11 +44,11 @@ export function resolveHeroOffer(
   const cheapestWithUrl = offers.find((candidate) => candidate.isCheapest && hasUrl(candidate))
   if (cheapestWithUrl) return cheapestWithUrl.offer
 
-  const anyWithUrl = offers.find(hasUrl)
-  if (anyWithUrl) return anyWithUrl.offer
-
   const cheapestWithCrop = offers.find((candidate) => candidate.isCheapest && hasCrop(candidate))
   if (cheapestWithCrop) return cheapestWithCrop.offer
+
+  const anyWithUrl = offers.find(hasUrl)
+  if (anyWithUrl) return anyWithUrl.offer
 
   return offers.find(hasCrop)?.offer ?? null
 }
