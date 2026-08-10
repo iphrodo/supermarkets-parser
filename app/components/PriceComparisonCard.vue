@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import type { ComparisonGroup } from '../../shared/types/comparison'
 import type { LeafletPage, Offer } from '../../shared/types/offer'
 import { useOffersByKey } from '../composables/useOffersByKey'
-import { RETAILER_LABELS, formatEur, formatUnitPrice } from '../utils/format'
+import { RETAILER_LABELS, formatDate, formatEur, formatUnitPrice } from '../utils/format'
 import { resolveHeroOffer } from '../utils/hero-image'
 import DepartmentPlaceholder from './DepartmentPlaceholder.vue'
 import ProductThumb from './ProductThumb.vue'
@@ -111,6 +111,9 @@ function difference(row: Row): string {
       </div>
       <p v-if="cheapest" class="text-xs text-gray-500 dark:text-gray-400">
         {{ formatEur(cheapest.priceEurCents) }} · {{ cheapest.offer.unitText }}
+      </p>
+      <p v-if="cheapest" class="text-xs text-gray-500 dark:text-gray-400">
+        Валидна до {{ formatDate(cheapest.offer.validUntil) }}
       </p>
 
       <ul v-if="others.length" class="mt-1 flex flex-col gap-0.5">
