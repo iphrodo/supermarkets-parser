@@ -32,6 +32,7 @@ function update(partial: Partial<DealsFilterValue>) {
         <option value="kaufland">Kaufland</option>
         <option value="lidl">Lidl</option>
         <option value="billa">Billa</option>
+        <option value="bulmag">BulMag</option>
       </select>
     </label>
 

@@ -1,6 +1,6 @@
 import type { ComparisonGroup } from './comparison'
 
-export type Retailer = 'kaufland' | 'lidl' | 'billa'
+export type Retailer = 'kaufland' | 'lidl' | 'billa' | 'bulmag'
 
 export type OfferScope = 'national' | 'regional'
 
@@ -78,5 +78,6 @@ export interface DealsSnapshot {
     lidl: { scrapedAt: string | null; ok: boolean }
     lidlSite: { scrapedAt: string | null; ok: boolean }
     billa: { scrapedAt: string | null; ok: boolean }
+    bulmag: { scrapedAt: string | null; ok: boolean }
   }
 }

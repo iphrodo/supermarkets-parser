@@ -1,0 +1,8 @@
+{
+  "code": 200,
+  "status": "success",
+  "data": {
+    "promotionFrom": "10.08.2026",
+    "promotionTo": "16.08.2026"
+  }
+}

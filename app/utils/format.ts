@@ -12,6 +12,7 @@ export const RETAILER_LABELS: Record<Retailer, string> = {
   kaufland: 'Kaufland',
   lidl: 'Lidl',
   billa: 'Billa',
+  bulmag: 'BulMag',
 }
 
 export const UNIT_SUFFIX: Record<UnitBase, string> = {

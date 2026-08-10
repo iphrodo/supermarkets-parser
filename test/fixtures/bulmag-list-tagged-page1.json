@@ -1,0 +1,45 @@
+{
+  "code": 200,
+  "status": "success",
+  "data": {
+    "totalItems": 3,
+    "data": [
+      {
+        "id": 1692,
+        "price": 0.86,
+        "priceBgn": 1.68,
+        "number": 21713,
+        "brand": null,
+        "productTypeName": "Кореноплодни",
+        "productTypeSlug": "plodove-i-zelenchuci-presni-zelenchuci-korenoplodni",
+        "promoPrice": 0.69,
+        "promoPriceBgn": 1.35,
+        "discount": 20,
+        "imageThumbnail": "https://api.bulmag.org/thumbnails/8bc2c806943bd3094a082f8bf949ee09.jpeg",
+        "name": "Картофи мити II",
+        "slug": "kartofi-miti-ii",
+        "measure": "КГ",
+        "noQuantity": false,
+        "specialTags": { "topLeft": [], "topRight": [] }
+      },
+      {
+        "id": 13721,
+        "price": 0.14,
+        "priceBgn": 0.27,
+        "number": 39510,
+        "brand": null,
+        "productTypeName": "Хлебчета",
+        "productTypeSlug": "svezhi-hrani-pekarna-hlebcheta",
+        "promoPrice": 0.09,
+        "promoPriceBgn": 0.18,
+        "discount": 36,
+        "imageThumbnail": "https://api.bulmag.org/thumbnails/2674e12265878011beb62a425b076153.jpg",
+        "name": "Питка земел кайзер Симид 60гр",
+        "slug": "pitka-zemel-kayzer-simid-60gr",
+        "measure": "БР",
+        "noQuantity": false,
+        "specialTags": { "topLeft": [], "topRight": [] }
+      }
+    ]
+  }
+}

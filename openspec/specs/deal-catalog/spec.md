@@ -10,8 +10,8 @@ Defines the shared normalized offer schema, product/offer identity keys, and mer
 Every offer in the catalog, regardless of source, SHALL conform to one shared schema using integer cents for all prices, an enum `loyaltyTier`, an enum `mechanic`, nullable fields where data is not always present (`originalPriceEurCents`, `priceBgnCents`, `brand`, `purchaseLimit`, `campaign`, `ean`, `imageUrl`, `imageCrop`), and required `sourceUrl`, `scrapedAt`, and `warnings` fields. Product imagery SHALL be expressed in exactly one of two forms — a direct image URL, or a crop referencing a region of a leaflet page — and which form a source uses SHALL be a property of that source, not of the individual offer. A source that publishes product photographs as their own images SHALL use the direct-URL form regardless of whether its offers originate from a promotional campaign.
 
 #### Scenario: Cross-source consistency
-- **WHEN** offers from Kaufland, Lidl, and Billa are all present in the catalog
-- **THEN** all SHALL expose the same field names and types, differing only in which nullable fields are populated and which are structurally absent (e.g. `productUrl` never exists on Kaufland offers, `imageUrl` never exists on leaflet-derived offers, `imageCrop` never exists on Kaufland or Lidl offers)
+- **WHEN** offers from Kaufland, Lidl, Billa, and BulMag are all present in the catalog
+- **THEN** all SHALL expose the same field names and types, differing only in which nullable fields are populated and which are structurally absent (e.g. `productUrl` never exists on Kaufland offers, `imageUrl` never exists on leaflet-derived offers, `imageCrop` never exists on Kaufland, Lidl, or BulMag offers)
 
 #### Scenario: Prices stored as integer cents
 - **WHEN** any offer is added to the catalog
@@ -24,6 +24,10 @@ Every offer in the catalog, regardless of source, SHALL conform to one shared sc
 #### Scenario: Lidl site offer carries an image URL
 - **WHEN** an offer from the Lidl product listing is added to the catalog
 - **THEN** it SHALL include an `imageUrl` field, either populated with the published product photograph's URL or null when the listing carried no image, and SHALL NOT carry an `imageCrop` field
+
+#### Scenario: BulMag offer carries an image URL
+- **WHEN** a BulMag offer is added to the catalog
+- **THEN** it SHALL include an `imageUrl` field, either populated with the product's photograph URL or null when the listing carried no image, and SHALL NOT carry an `imageCrop` field
 
 #### Scenario: Leaflet-derived offer carries an image crop
 - **WHEN** an offer extracted from a leaflet page image is added to the catalog
@@ -40,6 +44,10 @@ Every offer in the catalog, regardless of source, SHALL conform to one shared sc
 #### Scenario: Billa offer carries OCR-derived uncertainty warnings
 - **WHEN** a Billa offer is added to the catalog whose non-critical fields were extracted with lower OCR confidence
 - **THEN** it SHALL surface that uncertainty through the shared `warnings` field, using the same mechanism as any other source's warnings, rather than a Billa-specific schema field
+
+#### Scenario: BulMag offer has no EAN
+- **WHEN** a BulMag offer is added to the catalog
+- **THEN** its `ean` field SHALL be null, since BulMag's source data exposes no barcode, and its identity SHALL instead be derived from name and unit text
 
 ### Requirement: Two-level offer identity
 The system SHALL compute a `productKey` that is stable across weeks (derived without dates) and an `offerKey` computed as `productKey` plus the offer's `validFrom`.
@@ -66,7 +74,7 @@ Before computing `productKey`, the system SHALL normalize case, whitespace, and 
 The system SHALL represent store/region information as a `scope: 'national' | 'regional'` property, with an optional store reference populated only when `scope` is `'regional'`, rather than duplicating store name and city on every offer record.
 
 #### Scenario: National offer
-- **WHEN** an offer's price and availability do not vary by store (as verified for Lidl, and assumed by default for Kaufland pending verification)
+- **WHEN** an offer's price and availability do not vary by store (as verified for Lidl, and assumed by default for Kaufland and BulMag pending verification)
 - **THEN** the offer SHALL be tagged `scope: 'national'` with no store reference attached
 
 ### Requirement: Snapshot carries comparison groups by reference

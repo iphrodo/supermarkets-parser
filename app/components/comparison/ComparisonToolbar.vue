@@ -30,7 +30,7 @@ const SORT_LABELS: Record<SortKey, string> = {
   label: 'По име',
 }
 
-const ALL_RETAILERS: readonly Retailer[] = ['kaufland', 'lidl', 'billa']
+const ALL_RETAILERS: readonly Retailer[] = ['kaufland', 'lidl', 'billa', 'bulmag']
 
 /** Below `sm` everything except search collapses behind this, so the sticky header does not eat the first card. */
 const sheetOpen = ref(false)
