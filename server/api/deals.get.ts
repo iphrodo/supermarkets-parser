@@ -11,6 +11,7 @@ const EMPTY_SNAPSHOT: DealsSnapshot = {
     lidl: { ok: false, scrapedAt: null },
     lidlSite: { ok: false, scrapedAt: null },
     billa: { ok: false, scrapedAt: null },
+    bulmag: { ok: false, scrapedAt: null },
   },
 }
 

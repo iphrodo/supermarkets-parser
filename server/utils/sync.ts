@@ -47,6 +47,7 @@ export interface RunSyncDeps {
   fetchLidlOffers: () => Promise<SourceIngestResult>
   fetchLidlSiteOffers: () => Promise<SourceIngestResult>
   fetchBillaOffers: () => Promise<SourceIngestResult>
+  fetchBulmagOffers: () => Promise<SourceIngestResult>
   readSnapshot: () => Promise<DealsSnapshot | null>
   writeSnapshot: (snapshot: DealsSnapshot) => Promise<void>
   /** Injectable so tests never touch the network; defaults to the real model-backed classifier. */
@@ -131,6 +132,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
       belongsToSource: (o) => o.retailer === 'billa',
       pageIdPrefix: BILLA_PAGE_ID_PREFIX,
     },
+    { key: 'bulmag', label: 'Bulmag', fetch: deps.fetchBulmagOffers, belongsToSource: (o) => o.retailer === 'bulmag' },
   ]
 
   const results = await Promise.all(sources.map((source) => runSource(source.fetch)))

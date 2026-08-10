@@ -1,5 +1,6 @@
 import { readSnapshot, writeSnapshot } from '../../utils/kv'
 import { fetchBillaOffers } from '../../utils/scrapers/billa'
+import { fetchBulmagOffers } from '../../utils/scrapers/bulmag'
 import { fetchKauflandOffers } from '../../utils/scrapers/kaufland'
 import { fetchLidlOffers } from '../../utils/scrapers/lidl'
 import { fetchLidlSiteOffers } from '../../utils/scrapers/lidl-site'
@@ -23,6 +24,7 @@ export default defineEventHandler(async (event) => {
     fetchLidlOffers: async () => ({ offers: await fetchLidlOffers() }),
     fetchLidlSiteOffers: async () => ({ offers: await fetchLidlSiteOffers() }),
     fetchBillaOffers,
+    fetchBulmagOffers: async () => ({ offers: await fetchBulmagOffers() }),
     readSnapshot,
     writeSnapshot,
   })

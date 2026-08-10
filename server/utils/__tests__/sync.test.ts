@@ -9,7 +9,7 @@ const LIDL_SITE_URL = 'https://www.lidl.bg/p/milbona-kashkaval/p10060798'
 /** A leaflet source that no longer exists; its leftovers must not survive a run. */
 const REMOVED_LIDL_LEAFLET_URL = 'https://www.lidl.bg/l/bg/broshura/lidl-bg-kw32-2026-08-03/ar/0'
 
-function makeOffer(retailer: 'kaufland' | 'lidl' | 'billa', overrides: Partial<Offer> = {}): Offer {
+function makeOffer(retailer: 'kaufland' | 'lidl' | 'billa' | 'bulmag', overrides: Partial<Offer> = {}): Offer {
   const defaultSourceUrl = retailer === 'lidl' ? LIDL_XLSX_URL : 'https://example.com'
 
   return {
@@ -60,6 +60,7 @@ function makeSources(scrapedAt = '2026-07-31T00:00:00.000Z'): DealsSnapshot['sou
     lidl: { ok: true, scrapedAt },
     lidlSite: { ok: true, scrapedAt },
     billa: { ok: true, scrapedAt },
+    bulmag: { ok: true, scrapedAt },
   }
 }
 
@@ -79,13 +80,14 @@ const passthroughMerge = async (vocabulary: ProductTypeVocabulary, assignments: 
 })
 
 describe('runDailySync', () => {
-  it('publishes a fresh snapshot when all four sources succeed', async () => {
+  it('publishes a fresh snapshot when all five sources succeed', async () => {
     const writeSnapshot = vi.fn()
     const result = await runDailySync({
       fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
       fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer()] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      fetchBulmagOffers: async () => ({ offers: [makeOffer('bulmag')] }),
       readSnapshot: async () => null,
       writeSnapshot,
       backfillDepartments: passthroughBackfill,
@@ -95,9 +97,41 @@ describe('runDailySync', () => {
 
     expect(result.published).toBe(true)
     expect(result.reason).toBe('success')
-    expect(result.snapshot!.offers).toHaveLength(4)
+    expect(result.snapshot!.offers).toHaveLength(5)
     expect(result.snapshot!.sources.lidlSite.ok).toBe(true)
+    expect(result.snapshot!.sources.bulmag.ok).toBe(true)
     expect(writeSnapshot).toHaveBeenCalledTimes(1)
+  })
+
+  it('carries forward Bulmag’s own last known-good offers when only it fails', async () => {
+    const previous: DealsSnapshot = {
+      offers: [makeOffer('bulmag', { offerKey: 'stale-bulmag', scrapedAt: '2026-07-31T00:00:00.000Z' })],
+      comparisons: [],
+      leafletPages: {},
+      generatedAt: '2026-07-31T00:00:00.000Z',
+      sources: makeSources(),
+    }
+
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland')] }),
+      fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
+      fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer()] }),
+      fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      fetchBulmagOffers: async () => {
+        throw new Error('bulmag fetch failed')
+      },
+      readSnapshot: async () => previous,
+      writeSnapshot: vi.fn(),
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
+      logError: silentLog,
+    })
+
+    expect(result.published).toBe(true)
+    expect(result.reason).toBe('partial')
+    expect(result.snapshot!.offers.map((o) => o.offerKey)).toContain('stale-bulmag')
+    expect(result.snapshot!.sources.bulmag.ok).toBe(false)
+    expect(result.snapshot!.sources.bulmag.scrapedAt).toBe('2026-07-31T00:00:00.000Z')
   })
 
   it('carries forward a failed source’s last known-good offers when the others succeed', async () => {
@@ -117,6 +151,7 @@ describe('runDailySync', () => {
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl', { offerKey: 'fresh-lidl' })] }),
       fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer({ offerKey: 'fresh-lidl-site' })] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa', { offerKey: 'fresh-billa' })] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => previous,
       writeSnapshot,
       backfillDepartments: passthroughBackfill,
@@ -154,6 +189,7 @@ describe('runDailySync', () => {
         throw new Error('lidl site down')
       },
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
       backfillDepartments: passthroughBackfill,
@@ -197,6 +233,7 @@ describe('runDailySync', () => {
         throw new Error('lidl site down')
       },
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
       backfillDepartments: passthroughBackfill,
@@ -232,6 +269,7 @@ describe('runDailySync', () => {
         throw new Error('lidl site down')
       },
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa', { offerKey: 'fresh-billa' })] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
       backfillDepartments: passthroughBackfill,
@@ -245,7 +283,7 @@ describe('runDailySync', () => {
     expect(offerKeys).toEqual(expect.arrayContaining(['stale-kaufland', 'stale-lidl', 'fresh-billa']))
   })
 
-  it('leaves the previous snapshot untouched and does not publish when all four sources fail', async () => {
+  it('leaves the previous snapshot untouched and does not publish when all five sources fail', async () => {
     const writeSnapshot = vi.fn()
     const readSnapshot = vi.fn(async () => null)
 
@@ -261,6 +299,9 @@ describe('runDailySync', () => {
       },
       fetchBillaOffers: async () => {
         throw new Error('billa down')
+      },
+      fetchBulmagOffers: async () => {
+        throw new Error('bulmag down')
       },
       readSnapshot,
       writeSnapshot,
@@ -294,6 +335,7 @@ describe('runDailySync', () => {
       },
       fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer({ offerKey: 'fresh-lidl-site' })] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => previous,
       writeSnapshot,
       backfillDepartments: passthroughBackfill,
@@ -335,6 +377,7 @@ describe('runDailySync', () => {
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
       fetchLidlSiteOffers: async () => ({ offers: [makeLidlSiteOffer()] }),
       fetchBillaOffers: async () => ({ offers: [makeOffer('billa')] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => previous,
       writeSnapshot,
       classifyOffers: async () => {
@@ -358,6 +401,7 @@ describe('runDailySync', () => {
         offers: [withCrop(makeOffer('billa'), BILLA_PAGE_ID)],
         leafletPages: { [BILLA_PAGE_ID]: makePage(3, 'https://view.publitas.com/billa/cw31/') },
       }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
       backfillDepartments: passthroughBackfill,
@@ -393,6 +437,7 @@ describe('runDailySync', () => {
       fetchBillaOffers: async () => {
         throw new Error('billa down')
       },
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => previous,
       writeSnapshot: vi.fn(),
       backfillDepartments: passthroughBackfill,
@@ -418,6 +463,7 @@ describe('runDailySync', () => {
           'billa:cw31:4': makePage(4, 'https://view.publitas.com/billa/cw31/'),
         },
       }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
       backfillDepartments: passthroughBackfill,
@@ -439,6 +485,7 @@ describe('runDailySync', () => {
       }),
       fetchLidlSiteOffers: async () => ({ offers: [] }),
       fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot,
       classifyOffers: async () => ({
@@ -464,6 +511,7 @@ describe('runDailySync', () => {
       }),
       fetchLidlSiteOffers: async () => ({ offers: [] }),
       fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
       classifyOffers: async () => ({
@@ -488,6 +536,7 @@ describe('runDailySync', () => {
       }),
       fetchLidlSiteOffers: async () => ({ offers: [] }),
       fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
       // One product kind split across two duplicate types, one retailer each —
@@ -517,6 +566,7 @@ describe('runDailySync', () => {
       fetchLidlOffers: async () => ({ offers: [makeOffer('lidl')] }),
       fetchLidlSiteOffers: async () => ({ offers: [] }),
       fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
       mergeDuplicateTypes: async () => {
@@ -541,6 +591,7 @@ describe('runDailySync', () => {
       }),
       fetchLidlSiteOffers: async () => ({ offers: [] }),
       fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
       readSnapshot: async () => null,
       writeSnapshot: vi.fn(),
       classifyOffers: async () => ({

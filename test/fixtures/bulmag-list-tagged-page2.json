@@ -1,0 +1,27 @@
+{
+  "code": 200,
+  "status": "success",
+  "data": {
+    "totalItems": 3,
+    "data": [
+      {
+        "id": 667,
+        "price": 3.19,
+        "priceBgn": 6.24,
+        "number": 1754,
+        "brand": null,
+        "productTypeName": "Изворна вода",
+        "productTypeSlug": "napitki-voda-izvorna-voda",
+        "promoPrice": 2.29,
+        "promoPriceBgn": 4.48,
+        "discount": 28,
+        "imageThumbnail": "https://api.bulmag.org/thumbnails/86b0725de201da685de1593751042ee1.jpeg",
+        "name": "Изворна вода Devin 11л",
+        "slug": "izvorna-voda-devin-11l",
+        "measure": "БР",
+        "noQuantity": false,
+        "specialTags": { "topLeft": [], "topRight": [] }
+      }
+    ]
+  }
+}

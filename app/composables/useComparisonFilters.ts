@@ -15,7 +15,7 @@ export const DEFAULT_SORT: SortKey = 'savings'
  */
 export const MIN_SAVINGS_STEPS = [0.1, 0.2, 0.3] as const
 
-const RETAILERS: readonly Retailer[] = ['kaufland', 'lidl', 'billa']
+const RETAILERS: readonly Retailer[] = ['kaufland', 'lidl', 'billa', 'bulmag']
 
 /** Long enough that typing does not spray history/URL writes, short enough that a copied URL is current. */
 const SEARCH_DEBOUNCE_MS = 300

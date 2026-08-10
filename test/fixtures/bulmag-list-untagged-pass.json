@@ -1,0 +1,8 @@
+{
+  "code": 200,
+  "status": "success",
+  "data": {
+    "totalItems": 500,
+    "data": []
+  }
+}
