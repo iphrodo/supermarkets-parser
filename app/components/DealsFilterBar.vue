@@ -1,15 +1,16 @@
 <script setup lang="ts">
+import { DEPARTMENT_ICONS, DEPARTMENT_LABELS_BG, type DepartmentId } from '../../shared/types/department'
 import type { Retailer } from '../../shared/types/offer'
 
 export interface DealsFilterValue {
   retailer: Retailer | 'all'
-  category: string | 'all'
+  category: DepartmentId | 'all'
   maxPriceEurCents: number | null
 }
 
 const props = defineProps<{
   modelValue: DealsFilterValue
-  categories: string[]
+  categories: DepartmentId[]
 }>()
 
 const emit = defineEmits<{ 'update:modelValue': [DealsFilterValue] }>()
@@ -41,10 +42,12 @@ function update(partial: Partial<DealsFilterValue>) {
       <select
         class="rounded border border-gray-300 px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
         :value="modelValue.category"
-        @change="update({ category: ($event.target as HTMLSelectElement).value })"
+        @change="update({ category: ($event.target as HTMLSelectElement).value as DealsFilterValue['category'] })"
       >
         <option value="all">Всички категории</option>
-        <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
+        <option v-for="category in categories" :key="category" :value="category">
+          {{ DEPARTMENT_ICONS[category] }} {{ DEPARTMENT_LABELS_BG[category] }}
+        </option>
       </select>
     </label>
 

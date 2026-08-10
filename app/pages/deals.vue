@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DealsFilterValue } from '../components/DealsFilterBar.vue'
+import { DEPARTMENT_ORDER, toDepartmentId } from '../../shared/types/department'
 import type { DealsSnapshot } from '../../shared/types/offer'
 
 const BATCH_SIZE = 24
@@ -12,14 +13,15 @@ const offers = computed(() => snapshot.value?.offers ?? [])
 
 const leafletPages = computed(() => snapshot.value?.leafletPages ?? {})
 
-const categories = computed(() =>
-  Array.from(new Set(offers.value.map((offer) => offer.category))).sort((a, b) => a.localeCompare(b)),
-)
+const categories = computed(() => {
+  const present = new Set(offers.value.map((offer) => toDepartmentId(offer.department)))
+  return DEPARTMENT_ORDER.filter((id) => present.has(id))
+})
 
 const filteredOffers = computed(() =>
   offers.value.filter((offer) => {
     if (filter.value.retailer !== 'all' && offer.retailer !== filter.value.retailer) return false
-    if (filter.value.category !== 'all' && offer.category !== filter.value.category) return false
+    if (filter.value.category !== 'all' && toDepartmentId(offer.department) !== filter.value.category) return false
     if (filter.value.maxPriceEurCents !== null && offer.priceEurCents > filter.value.maxPriceEurCents) return false
     return true
   }),

@@ -7,7 +7,7 @@ import { OFFERS_BY_KEY, type OffersByKey } from '../../composables/useOffersByKe
 
 export const BATCH_SIZE = 24
 
-export function makeOffer(index: number, retailer: Retailer = 'kaufland'): Offer {
+export function makeOffer(index: number, retailer: Retailer = 'kaufland', overrides: Partial<Offer> = {}): Offer {
   return {
     offerKey: `offer-${index}`,
     productKey: `product-${index}`,
@@ -34,6 +34,7 @@ export function makeOffer(index: number, retailer: Retailer = 'kaufland'): Offer
     sourceUrl: 'https://example.com',
     scrapedAt: '2026-01-01T00:00:00.000Z',
     warnings: [],
+    ...overrides,
   }
 }
 

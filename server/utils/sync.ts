@@ -1,7 +1,8 @@
 import type { ComparisonGroup } from '../../shared/types/comparison'
+import { CATCH_ALL_DEPARTMENT, type DepartmentId } from '../../shared/types/department'
 import type { DealsSnapshot, LeafletPage, Offer } from '../../shared/types/offer'
 import { mergeCatalog } from './catalog'
-import { buildComparisons } from './comparison'
+import { buildComparisons, createDepartmentResolver } from './comparison'
 import type { ProductTypeAssignments, ProductTypeVocabulary } from './kv'
 import { classifyOffers as classifyOffersImpl, defaultClassifyOffersDeps } from './product-type'
 import { backfillDepartments as backfillDepartmentsImpl, defaultBackfillDepartmentsDeps } from './product-type-department'
@@ -109,6 +110,15 @@ function previousSourceStatus(
   return previous?.sources?.[key] ?? { scrapedAt: null, ok: false }
 }
 
+/** Departments already resolved for a previous run's offers, keyed by `offerKey` — the degrade-on-failure fallback. */
+function previousDepartmentsByOfferKey(previous: DealsSnapshot | null): Map<string, DepartmentId> {
+  const map = new Map<string, DepartmentId>()
+  for (const offer of previous?.offers ?? []) {
+    if (offer.department) map.set(offer.offerKey, offer.department)
+  }
+  return map
+}
+
 /**
  * Orchestrates one scheduled sync: runs every source's ingestion, isolates
  * each source's failure by carrying forward its own last known-good offers
@@ -175,6 +185,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
       mergeAndPersistDuplicateTypes(vocabulary, assignments, defaultMergeDuplicateTypesDeps()))
 
   let comparisons: ComparisonGroup[]
+  let offers: Offer[]
   try {
     const classified = await classify(merged.offers)
     // Inside the same guard as classification: a failure here must degrade to
@@ -184,10 +195,17 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
     // type that is about to be merged away.
     const deduped = await dedupe(classified.vocabulary, classified.assignments)
     const withDepartments = await backfill(deduped.vocabulary)
+    const resolveDepartment = createDepartmentResolver(withDepartments, deduped.assignments)
     comparisons = buildComparisons(merged.offers, withDepartments, deduped.assignments)
+    offers = merged.offers.map((offer) => ({ ...offer, department: resolveDepartment.forProductKey(offer.productKey) }))
   } catch (error) {
     log('Comparison enrichment failed; publishing with the previous snapshot’s comparisons', error)
     comparisons = previous?.comparisons ?? []
+    const previousDepartments = previousDepartmentsByOfferKey(previous)
+    offers = merged.offers.map((offer) => ({
+      ...offer,
+      department: previousDepartments.get(offer.offerKey) ?? CATCH_ALL_DEPARTMENT,
+    }))
   }
 
   const sourcesBlock = Object.fromEntries(
@@ -201,7 +219,7 @@ export async function runDailySync(deps: RunSyncDeps): Promise<RunSyncResult> {
   ) as DealsSnapshot['sources']
 
   const snapshot: DealsSnapshot = {
-    offers: merged.offers,
+    offers,
     comparisons,
     leafletPages,
     generatedAt: now().toISOString(),

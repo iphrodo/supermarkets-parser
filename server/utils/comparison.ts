@@ -1,5 +1,5 @@
 import type { ComparisonEntry, ComparisonGroup } from '../../shared/types/comparison'
-import { toDepartmentId } from '../../shared/types/department'
+import { CATCH_ALL_DEPARTMENT, toDepartmentId, type DepartmentId } from '../../shared/types/department'
 import type { Offer, Retailer } from '../../shared/types/offer'
 import type { ProductTypeAssignments, ProductTypeVocabulary } from './kv'
 import { parseQuantity, unitPriceEurCents } from './quantity'
@@ -18,6 +18,37 @@ function median(values: number[]): number {
   return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!
 }
 
+/** Resolves a canonical product type's department from either the type id or an offer's `productKey`. */
+export interface DepartmentResolver {
+  forTypeId(typeId: string | undefined): DepartmentId
+  forProductKey(productKey: string): DepartmentId
+}
+
+/**
+ * Joins `productKey → typeId → ProductType.department` through the same
+ * vocabulary/assignments already computed each sync. Extracted from
+ * `buildComparisons` so per-offer department annotation (`sync.ts`) doesn't
+ * duplicate the join.
+ */
+export function createDepartmentResolver(
+  vocabulary: ProductTypeVocabulary,
+  assignments: ProductTypeAssignments,
+): DepartmentResolver {
+  const typesById = new Map(vocabulary.map((type) => [type.id, type]))
+
+  function forTypeId(typeId: string | undefined): DepartmentId {
+    if (!typeId) return CATCH_ALL_DEPARTMENT
+    const type = typesById.get(typeId)
+    return toDepartmentId(type?.department)
+  }
+
+  function forProductKey(productKey: string): DepartmentId {
+    return forTypeId(assignments[productKey])
+  }
+
+  return { forTypeId, forProductKey }
+}
+
 /**
  * Builds cross-retailer comparison groups from a snapshot's offers.
  * Groups by canonical product type, reduces each retailer to its cheapest
@@ -30,6 +61,7 @@ export function buildComparisons(
   assignments: ProductTypeAssignments,
 ): ComparisonGroup[] {
   const typesById = new Map(vocabulary.map((type) => [type.id, type]))
+  const resolveDepartment = createDepartmentResolver(vocabulary, assignments)
 
   const byTypeId = new Map<string, CandidateEntry[]>()
 
@@ -99,7 +131,7 @@ export function buildComparisons(
       groupKey: typeId,
       labelBg: type.labelBg,
       unitBase: type.unitBase,
-      department: toDepartmentId(type.department),
+      department: resolveDepartment.forTypeId(typeId),
       entries,
       savingsPercentage,
       warnings,
