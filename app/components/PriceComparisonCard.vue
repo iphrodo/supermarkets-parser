@@ -93,8 +93,10 @@ function difference(row: Row): string {
     </div>
 
     <div class="flex min-w-0 flex-1 flex-col gap-1">
-      <div class="flex items-start justify-between gap-2">
-        <h3 class="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{{ group.labelBg }}</h3>
+      <div class="flex min-w-0 items-start justify-between gap-2">
+        <h3 class="line-clamp-2 min-w-0 break-words text-sm font-semibold text-gray-900 dark:text-gray-100">
+          {{ group.labelBg }}
+        </h3>
         <span
           v-if="savings"
           class="shrink-0 whitespace-nowrap rounded bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-950 dark:text-green-300"
