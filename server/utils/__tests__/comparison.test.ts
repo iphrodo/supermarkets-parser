@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Offer } from '../../../shared/types/offer'
-import { buildComparisons } from '../comparison'
+import { buildComparisons, createDepartmentResolver } from '../comparison'
 import type { ProductType, ProductTypeAssignments, ProductTypeVocabulary } from '../kv'
 
 const CHICKEN_TYPE: ProductType = { id: 'chicken-breast', labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg' }
@@ -180,5 +180,40 @@ describe('buildComparisons', () => {
     const groups = buildComparisons(offers, vocabulary, assignments)
 
     expect(groups[0]!.department).toBe('other')
+  })
+})
+
+describe('createDepartmentResolver', () => {
+  const vocabulary: ProductTypeVocabulary = [{ ...CHICKEN_TYPE, department: 'meat' }, YOGURT_TYPE]
+  const assignments: ProductTypeAssignments = { 'chicken-1': 'chicken-breast', 'yogurt-1': 'yogurt' }
+
+  it('resolves a known type’s department by typeId', () => {
+    const resolver = createDepartmentResolver(vocabulary, assignments)
+
+    expect(resolver.forTypeId('chicken-breast')).toBe('meat')
+  })
+
+  it('falls back to the catch-all for an unknown typeId', () => {
+    const resolver = createDepartmentResolver(vocabulary, assignments)
+
+    expect(resolver.forTypeId('unknown-type')).toBe('other')
+  })
+
+  it('falls back to the catch-all when the matched type has no department', () => {
+    const resolver = createDepartmentResolver(vocabulary, assignments)
+
+    expect(resolver.forTypeId('yogurt')).toBe('other')
+  })
+
+  it('resolves forProductKey through assignments', () => {
+    const resolver = createDepartmentResolver(vocabulary, assignments)
+
+    expect(resolver.forProductKey('chicken-1')).toBe('meat')
+  })
+
+  it('falls back to the catch-all for an unmapped productKey', () => {
+    const resolver = createDepartmentResolver(vocabulary, assignments)
+
+    expect(resolver.forProductKey('unmapped-product')).toBe('other')
   })
 })

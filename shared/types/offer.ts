@@ -1,4 +1,5 @@
 import type { ComparisonGroup } from './comparison'
+import type { DepartmentId } from './department'
 
 export type Retailer = 'kaufland' | 'lidl' | 'billa' | 'bulmag'
 
@@ -47,6 +48,13 @@ export interface Offer {
   name: string
   unitText: string
   category: string
+  /**
+   * Resolved via classification, same as `ProductType.department`. Absence is
+   * meaningful — scrapers construct offers before classification runs, and
+   * cached pre-migration snapshots predate this field — so consumers coerce
+   * with `toDepartmentId` rather than assuming presence.
+   */
+  department?: DepartmentId
   campaign: string | null
   discountPercentage: number
   priceEurCents: number

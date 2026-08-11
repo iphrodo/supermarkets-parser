@@ -607,4 +607,86 @@ describe('runDailySync', () => {
     expect(result.published).toBe(true)
     expect(logError).toHaveBeenCalledOnce()
   })
+
+  it('annotates published offers with their resolved department on classification success', async () => {
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({
+        offers: [makeOffer('kaufland', { offerKey: 'k', productKey: 'k', priceEurCents: 500, unitText: '500 г' })],
+      }),
+      fetchLidlOffers: async () => ({ offers: [] }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
+      fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
+      readSnapshot: async () => null,
+      writeSnapshot: vi.fn(),
+      classifyOffers: async () => ({
+        vocabulary: [{ id: 'chicken-breast', labelBg: 'Пилешко филе', labelEn: 'Chicken breast', unitBase: 'kg' }],
+        assignments: { k: 'chicken-breast' },
+      }),
+      backfillDepartments: async (vocabulary) => vocabulary.map((type) => ({ ...type, department: 'meat' as const })),
+      mergeDuplicateTypes: passthroughMerge,
+      logError: silentLog,
+    })
+
+    const offer = result.snapshot!.offers.find((o) => o.offerKey === 'k')
+    expect(offer?.department).toBe('meat')
+  })
+
+  it('inherits an offer’s department from the previous snapshot when enrichment fails', async () => {
+    const previous: DealsSnapshot = {
+      offers: [makeOffer('kaufland', { offerKey: 'k', department: 'meat' })],
+      comparisons: [],
+      leafletPages: {},
+      generatedAt: '2026-07-31T00:00:00.000Z',
+      sources: makeSources(),
+    }
+
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland', { offerKey: 'k' })] }),
+      fetchLidlOffers: async () => ({ offers: [] }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
+      fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
+      readSnapshot: async () => previous,
+      writeSnapshot: vi.fn(),
+      classifyOffers: async () => {
+        throw new Error('classification service unavailable')
+      },
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
+      logError: silentLog,
+    })
+
+    const offer = result.snapshot!.offers.find((o) => o.offerKey === 'k')
+    expect(offer?.department).toBe('meat')
+  })
+
+  it('defaults a brand-new offer with no previous match to the catch-all department when enrichment fails', async () => {
+    const previous: DealsSnapshot = {
+      offers: [],
+      comparisons: [],
+      leafletPages: {},
+      generatedAt: '2026-07-31T00:00:00.000Z',
+      sources: makeSources(),
+    }
+
+    const result = await runDailySync({
+      fetchKauflandOffers: async () => ({ offers: [makeOffer('kaufland', { offerKey: 'brand-new' })] }),
+      fetchLidlOffers: async () => ({ offers: [] }),
+      fetchLidlSiteOffers: async () => ({ offers: [] }),
+      fetchBillaOffers: async () => ({ offers: [] }),
+      fetchBulmagOffers: async () => ({ offers: [] }),
+      readSnapshot: async () => previous,
+      writeSnapshot: vi.fn(),
+      classifyOffers: async () => {
+        throw new Error('classification service unavailable')
+      },
+      backfillDepartments: passthroughBackfill,
+      mergeDuplicateTypes: passthroughMerge,
+      logError: silentLog,
+    })
+
+    const offer = result.snapshot!.offers.find((o) => o.offerKey === 'brand-new')
+    expect(offer?.department).toBe('other')
+  })
 })

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import DealsFilterBar, { type DealsFilterValue } from '../app/components/DealsFilterBar.vue'
+import type { DepartmentId } from '../shared/types/department'
 
 const meta: Meta<typeof DealsFilterBar> = {
   title: 'Deals/DealsFilterBar',
@@ -9,7 +10,7 @@ const meta: Meta<typeof DealsFilterBar> = {
 export default meta
 type Story = StoryObj<typeof DealsFilterBar>
 
-const categories = ['Плодове и зеленчуци', 'Млечни продукти', 'Замразени продукти']
+const categories: DepartmentId[] = ['fruit-veg', 'dairy-eggs', 'frozen']
 
 export const Default: Story = {
   args: {
